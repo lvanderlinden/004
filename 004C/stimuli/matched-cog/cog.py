@@ -18,13 +18,13 @@ cenCol = "#729fcf"
 
 
 
-def cog(src, show=True, invert=False, edgeDetect=True, col = True):
+def cog(_src, show=False, invert=True, edgeDetect=True, col = True):
 
 	"""
 	Gets the center of gravity for an image
 
 	Arguments:
-	src		--	a 3d numpy array or a string corresponding to an image file
+	_src		--	a 3d numpy array or a string corresponding to an image file
 
 	Keyword arguments:
 	show			--- Boolean indicating whether or not to plot the (inverted, \
@@ -41,22 +41,24 @@ def cog(src, show=True, invert=False, edgeDetect=True, col = True):
 	"""
 
 	# Read if the image is a string and not a numpy array
-	path, ext = os.path.splitext(src)
-	pict = path.split("/")[-1]
-	figName = "CoG calculation %s invert = %s edgeDetect = %s.svg"%(pict, invert, edgeDetect)
+	#path, ext = os.path.splitext(src)
+	#pict = path.split("/")[-1]
+	#figName = "CoG calculation %s invert = %s edgeDetect = %s.svg"%(pict, invert, edgeDetect)
 
 
 
-	if isinstance(src, basestring):
-		src = plt.imread(src)
+	#if isinstance(src, basestring):
+	#	src = plt.imread(src)
+	#
+	#print src.dtype, np.max(src), np.min(src)
 	
-	print src.dtype, np.max(src), np.min(src)
-	
-	original = src
+	#original = src
 	
 	#src = np.array(src, np.uint32)	
-	_src = np.empty(src.shape, dtype=np.uint32)
-	_src[:] = src
+	
+	# TODO: change 'corrCoG.py' such that it takes src as input
+#	_src = np.empty(src.shape, dtype=np.uint32)
+#	_src[:] = src
 	src = _src
 		
 	# Invert the 0-1 values		

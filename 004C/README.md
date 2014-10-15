@@ -1,4 +1,6 @@
-# 004C: Experiment 3, for JoV Revision 1
+# 004C:
+
+Experiment 3, for JoV Revision 1
 
 ## stimuli
 

@@ -1,16 +1,22 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
+"""
+DESCRIPTION:
+Transforms non-objects until CoG matches the CoG of the real object.
+"""
+
+
 from exparser.DataMatrix import DataMatrix
-#from generate import edgeDetect
 import os
+import cog
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy import ndimage, interpolate, misc
 from exparser import TraceKit as tk
 from skimage import draw
 
-def cog(path, f=1.25, xy=None, th=10, show=False):
+def matchCog(path, f=1.05, xy=None, th=2, show=False):
 
 	"""
 	desc:
@@ -28,20 +34,13 @@ def cog(path, f=1.25, xy=None, th=10, show=False):
 		show:	Indicates whether a plot should be shown.
 	"""
 
-	src = ndimage.imread(path)[:,:,:3]
-	while True:
-		im = np.array(src, np.uint32)
-		
-		#if edgeDetect:
-		sx = ndimage.sobel(src, axis=0, mode='constant')
-		sy = ndimage.sobel(src, axis=1, mode='constant')
-		src = np.hypot(sx, sy)
-		
-		#im = edgeDetect(im)
-		y, x, col = ndimage.measurements.center_of_mass(im)
-		#print src
-		#print x
-		#sys.exit()
+	_src = ndimage.imread(path)[:,:,:3]	
+	src = np.empty(_src.shape, dtype=np.uint32)
+	src[:] = _src
+
+	while True:				
+		#im = np.array(_src, np.uint32)
+		x, y = cog.cog(src.copy())		
 		print 'COG = %.2f, %.2f' % (x, y)
 		if xy == None or abs(x-xy[0]) < th:
 			break
@@ -50,18 +49,20 @@ def cog(path, f=1.25, xy=None, th=10, show=False):
 			src = transform(src, left=f, right=1./f)
 		else:
 			src = transform(src, left=1./f, right=f)
-			misc.imsave(path+'.cog-correct.png', src)
-	xc = im.shape[1]/2
-	yc = im.shape[0]/2
+		misc.imsave(path+'.cog-correct.jpg', src)
+	misc.imsave(path+'.cog-correct.jpg', src)
+	xc = src.shape[1]/2
+	yc = src.shape[0]/2
 	if show:
-		plt.imshow(im)
-		plt.axhline(y, color='red')
-		plt.axvline(x, color='red')
+		plt.imshow(src)
+		plt.axhline(y+yc, color='red')
+		plt.axvline(x+xc, color='red')
 		plt.axhline(yc, color='blue')
 		plt.axvline(xc, color='blue')
+		plt.show()
 	return x, y
 
-def transform(im, left=1, right=1):
+def transform(im, left=1., right=1.):
 
 	"""
 	desc:
@@ -79,6 +80,7 @@ def transform(im, left=1, right=1):
 	im2 = np.empty(im.shape, dtype=im.dtype)
 	im2[:] = 255
 	yc = im.shape[0]/2
+	print 'transform: %.4f - %.4f' % (left, right)
 	transform = np.linspace(left, right, im.shape[1])
 	for x in range(im.shape[1]):
 		for y in range(im.shape[0]):
@@ -104,20 +106,23 @@ if __name__ == '__main__':
 	srcNob = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/stimuli/final/non-objects with texture"
 
 	l = [['img', 'xCogOrig', 'yCogOrig', 'xCogMatch', 'yCogMatch']]
-	for stimName in os.listdir(srcOb):
-		if "png" in stimName:
+	for obj in os.listdir(srcOb):
+		if "png" in obj or 'cog-correct' in obj:
 			continue
-		objPath = os.path.join(srcOb, stimName)
-		nobPath = os.path.join(srcNob, stimName)
-		#plt.subplot(211)
+		if "hammer" in obj:
+			continue
+		nob = "non-%s" % obj
+		
+		objPath = os.path.join(srcOb, obj)
+		nobPath = os.path.join(srcNob, nob)
 		print 'Original %s' % objPath
-		x, y = cog(objPath)
-		print "x cog norm = ", x-xCen
-		sys.exit()
-		#plt.subplot(212)
+		x, y = matchCog(objPath)
+		#print "cog = ", x
+		#sys.exit()
+		
 		print 'Match %s' % nobPath
-		_x, _y = cog(nobPath, xy=(x,y))
-		l.append([stimName, x, y, _x, _y])
+		_x, _y = matchCog(nobPath, xy=(x,y))
+		l.append([obj, x, y, _x, _y])
 		#plt.show()
 		#break
 
