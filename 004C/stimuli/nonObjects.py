@@ -1,7 +1,12 @@
 import os
 import numpy as np
 from PIL import Image
-
+import sys
+"""
+DESCRIPTION:
+Merges shapes for non objects (see shape.py) and textures for non-objects
+(see texture.py)
+"""
 
 def sliced():
 
@@ -33,7 +38,9 @@ def merge():
 	lMaskMix = os.listdir(srcShapes)
 	
 	for stim in os.listdir(srcText):
-		print stim
+		
+		stimName = os.path.splitext(stim)[0]
+		
 		nonObject = lMaskMix.pop()
 		
 		path1 = os.path.join(srcText, stim)
@@ -51,7 +58,7 @@ def merge():
 		#	aFinal[:,:,channel] = aFinal[:,:,channel]*(a2/255)
 		aFinal[np.where(a2 != 255)] = 255
 		imFinal = Image.fromarray(aFinal)
-		imFinal.save(os.path.join(dst,stim))
+		imFinal.save(os.path.join(dst,"%s.jpg" % stimName))
 		#sys.exit()
 		
 if __name__ == "__main__":

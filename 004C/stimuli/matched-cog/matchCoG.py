@@ -39,9 +39,9 @@ def cog(path, f=1.25, xy=None, th=10, show=False):
 		
 		#im = edgeDetect(im)
 		y, x, col = ndimage.measurements.center_of_mass(im)
-		print src
-		print x
-		sys.exit()
+		#print src
+		#print x
+		#sys.exit()
 		print 'COG = %.2f, %.2f' % (x, y)
 		if xy == None or abs(x-xy[0]) < th:
 			break
@@ -91,17 +91,29 @@ def transform(im, left=1, right=1):
 
 if __name__ == '__main__':
 
+
+	# Size of the bitmaps:
+	width = 720
+	height = 540
+	
+	# Centers of the bitmap:
+	xCen = width/2
+	yCen = height/2
+
 	srcOb = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/stimuli/final/objects"
 	srcNob = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/stimuli/final/non-objects with texture"
 
 	l = [['img', 'xCogOrig', 'yCogOrig', 'xCogMatch', 'yCogMatch']]
 	for stimName in os.listdir(srcOb):
-		if 
+		if "png" in stimName:
+			continue
 		objPath = os.path.join(srcOb, stimName)
 		nobPath = os.path.join(srcNob, stimName)
 		#plt.subplot(211)
 		print 'Original %s' % objPath
 		x, y = cog(objPath)
+		print "x cog norm = ", x-xCen
+		sys.exit()
 		#plt.subplot(212)
 		print 'Match %s' % nobPath
 		_x, _y = cog(nobPath, xy=(x,y))

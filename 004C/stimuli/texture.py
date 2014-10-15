@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
+"""
+DESCRIPTION:
+Creates texture for non objects
+"""
+
 from scipy import ndimage, misc
 import numpy as np
 from matplotlib import pyplot as plt

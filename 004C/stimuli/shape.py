@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
+"""
+DESCRIPTION:
+Creates shapes for non objects.
+"""
+
 import os
 import numpy as np
 from matplotlib import pyplot as plt
