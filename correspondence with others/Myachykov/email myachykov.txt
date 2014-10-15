@@ -1,0 +1,14 @@
+ 
+ Dear Dr. Myachykov
+ 
+ For my PhD project I have carried out a series of studies in which I investigated saccadic landing positions on isolated graspable ('handled') objects. Therefore I'm very interested in your paper (Myachykov et al., 2013, Exp Brain Res) in which you show that participants spent more time looking at objects' handles than objects' 'bodies', and in which you intepret this as visual attention being automatically drawn towards the manipulable part of an object.
+ 
+ For my studies, I asked participants to make an eye movement towards isolated photographs of graspable objects (presented in the upper or lower peripheral visual field), and to classify them as a garage tool or a kitchen utensil by making a left- or right-handed button press. And, although this was task-irrelevant, the objects were oriented with their handle to the left or the right (so we used a classic SRC paradigm).
+ 
+ We found that initial saccades are directed to the peak of a saliency map of the stimulus. The subsequent within-object refixations, on the other hand, are systematically directed away from the handle of the object. Also, there is a correlation between landing position and fixation duration, such that the more the eyes land towards the handle part, the shorter the fixation durations.
+ 
+ I currently think that the best interpretation of these result is that the first eye movement reflects a low-level saliency effect, whereas the subsequent saccades are made towards the part of the object that contains most semantic information (which is needed to successfully perform the classifcation task).
+ 
+ Furthermore, we found that it matters enormously for the pattern of results what part of the object is taken as the reference point for the landing positions: The same pattern of results can 'reflect' a bias away versus towards the handle, dependig on whether an object's absolute center (middle of the bitmap) or a (self-calculated) center of gravity is taken as the reference point. I think the latter occurs because most of our handled objects (see attached) were 'heavier' (in terms of contrast with the white background of our display) at their non-handled side. In a stimulus set without such a bias this will probably be less of a problem.
+ 
+ All in all, I became very interested in what kind of stimuli you used for your study, and whether you think most of your objects were also 'heavier' on one side than the other. And whether the results are different for objects which don't have this bias (e.g. the screwdriver, which probably contains more pixels in the handle than in the body). Would it be possible to have a look at your stimuli?

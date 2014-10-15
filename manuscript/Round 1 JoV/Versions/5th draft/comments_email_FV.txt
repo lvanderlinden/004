@@ -1,0 +1,19 @@
+The fact still, I think, is that you missed to really value ALL the many important findings that it contains and you probably did not realize how strong the implications of your findings may be, at a theoretical level in particular. And I must confess that I didn't realize it to THAT extent until I sat and think and read your paper! What you find is really not trivial. It is more than saying that people should measure landing positions relative to (or control) the location of the CoG when working with objects as your last paragraphs in the General Discussion suggest. 
+
+- First, you show that the eyes move towards the center of gravity of real objects, which was never shown (we knew that only for shapes and contour drawings) and that suggests not only that the primacy of low-level visuo-motor effects and the fact that CoG mechanisms are the default, but it argues, as a consequence against the assumption that the eyes move towards the center of objects deliberately, in order to optimize visual processing (Antje's hypothesis). 
+
+- Second, you describe the time course of the CoG tendency and the reverse time course of higher-level processes, and this also was never done to my knowledge for real objects. And the fact is that it probably can only be done in the kind of simple display you used (and that also needs to be said; see my last comment on the main text). 
+
+- Third, you suggest, in a very elegant manner that saliency-type models are somehow mixing things up by making people believe that the eyes go to the most salient locations as there is probably a counfound with the center of gravity, and in any case your beautiful analysis increases the impact of the paper by contrasting CoG and saliency... 
+
+Thus, I start thinking that EBR may in the end, not be good enough and we should maybe rethink where to send your paper. It is not a Psych Science, but I'm pretty sure it would go through in JoV whose impact factor is 1 point higher than EBR (3.3. vs. 2.2 in 2012). Now there is the problem with the copyright that you're both attached to, so we can discuss it, it is only a suggestion, but I do think you would get the right and a larger audience in JOV...
+
+Anyway, to get back to the content of the paper, as you'll see my main comments relate to:
+
+(1) the intro and the general discussion which require to be re-structured and completed/revised to some extent (so as to better frame the many important things you show and clearly state the theoretically-guided goal of your study and its theoretical implications, and also in order to clarify a number of points)
+
+(2) the presentation of some results and the stats; I raise the possibility that you only include LME models for both Experiments 1 and 2. That is my *feeling* that it would be more consistent than mixing Anovas, ts and LME, and also that it would greatly simplify and shorten the presentation of the results/stats. It would also give a complete picture of all the relevant effects (you didn't tell whether target eccentricity, target direction, gap/overlap that you manipulated had an effect and I fear reviewers may not like that), and it would justify why it may be best to use for the statistical tests, saccade latency (which is a continuous variable) and not gap/overlap (which is a discrete variable). Sebastiaan's opinion on this will be very important.
+
+(3) I completely agree with Sebastiaan that Figure S5 and its description (though shorter for the observed distributions than in the suppl. material) should be moved back to the main text. And I really think that the saliency analysis should be moved to the GD.
+
+All that is anyway described in details (that's for sure!) in the commented version of the paper. I mainly wrote comments, as you asked, sometimes suggesting in the comment an alternative way to say things, but I revised also the text for minor (phrasing) points (as this would have taken me twice as much time to write this in a comment).

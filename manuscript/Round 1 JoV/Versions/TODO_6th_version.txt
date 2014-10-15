@@ -1,0 +1,5 @@
+Include references on the fact that SC has large and overlapping RF:
+	Goldberg & Wurtz (1972)
+	McIllwain (1975)
+	
+	

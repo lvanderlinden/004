@@ -1,0 +1,31 @@
+Experiment 004
+
+First experiment caarried out for PhD project.
+
+RATIO pixels/degrees:
+	For both horizontal and vertical (after rounding):
+		1 px = 0.03 degrees
+		1 degree = 33 px
+
+TODO: 
+administration for participants, have a complete list with 
+participants (and dates).
+
+Zit Dash (left-handed) nog in Exp 2?
+
+
+TODO for ECEM:
+- Know how I did the LSD in case there are questions about it??
+- Understand CoG calculations!!
+- Analyses like in Pajak & Nuthmann.
+- Also: VOICE locked? 
+	What was the LAST position during or just before response?
+	What was FIRST position after response?
+
+
+27-06-2013:
+Worked on manuscript in order to get the methods clear for the ECEM talk.
+Before making changes to the manuscript a saved the old version
+(containing, for example, a detailed explanation about the LSD).
+
+Merged the two manuscripts for 004A and 004B into one.

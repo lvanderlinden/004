@@ -1,0 +1,324 @@
+		Object =  asymm_garage_chisel2_mask_control.jpg
+
+Handle right: The center of gravity for the chisel2 is -0.3, -7.6
+Handle left: The center of gravity for the chisel2 is 0.3, -7.6
+The direction of the correction is:  correction smaller than 8
+
+		Object =  asymm_garage_chisel2_mask_left.jpg
+
+Handle right: The center of gravity for the chisel2 is 16.1, -8.7
+Handle left: The center of gravity for the chisel2 is -16.1, -8.7
+The direction of the correction is:  correction towardsHandle
+
+		Object =  asymm_garage_chisel2_mask_right.jpg
+
+Handle right: The center of gravity for the chisel2 is -5.8, -7.6
+Handle left: The center of gravity for the chisel2 is 5.8, -7.6
+The direction of the correction is:  correction smaller than 8
+
+		Object =  asymm_garage_chisel_mask_control.jpg
+
+Handle right: The center of gravity for the chisel is 26.4, -9.1
+Handle left: The center of gravity for the chisel is -26.4, -9.1
+The direction of the correction is:  correction towardsHandle
+
+		Object =  asymm_garage_chisel_mask_left.jpg
+
+Handle right: The center of gravity for the chisel is 42.5, -9.6
+Handle left: The center of gravity for the chisel is -42.5, -9.6
+The direction of the correction is:  correction towardsHandle
+
+		Object =  asymm_garage_chisel_mask_right.jpg
+
+Handle right: The center of gravity for the chisel is 22.8, -9.2
+Handle left: The center of gravity for the chisel is -22.8, -9.2
+The direction of the correction is:  correction towardsHandle
+
+		Object =  asymm_garage_hammer_mask_control.jpg
+
+Handle right: The center of gravity for the hammer is -51.3, -13.4
+Handle left: The center of gravity for the hammer is 51.3, -13.4
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_garage_hammer_mask_left.jpg
+
+Handle right: The center of gravity for the hammer is -36.6, -12.7
+Handle left: The center of gravity for the hammer is 36.6, -12.7
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_garage_hammer_mask_right.jpg
+
+Handle right: The center of gravity for the hammer is -48.7, -13.7
+Handle left: The center of gravity for the hammer is 48.7, -13.7
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_garage_mallet_mask_control.jpg
+
+Handle right: The center of gravity for the mallet is -35.5, -5.0
+Handle left: The center of gravity for the mallet is 35.5, -5.0
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_garage_mallet_mask_left.jpg
+
+Handle right: The center of gravity for the mallet is -26.0, -5.9
+Handle left: The center of gravity for the mallet is 26.0, -5.9
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_garage_mallet_mask_right.jpg
+
+Handle right: The center of gravity for the mallet is -38.0, -5.0
+Handle left: The center of gravity for the mallet is 38.0, -5.0
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_garage_paintbrush_mask_control.jpg
+
+Handle right: The center of gravity for the paintbrush is -38.5, -9.2
+Handle left: The center of gravity for the paintbrush is 38.5, -9.2
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_garage_paintbrush_mask_left.jpg
+
+Handle right: The center of gravity for the paintbrush is -30.2, -10.2
+Handle left: The center of gravity for the paintbrush is 30.2, -10.2
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_garage_paintbrush_mask_right.jpg
+
+Handle right: The center of gravity for the paintbrush is -40.0, -9.6
+Handle left: The center of gravity for the paintbrush is 40.0, -9.6
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_garage_screwdriver_mask_control.jpg
+
+Handle right: The center of gravity for the screwdriver is 53.3, -9.1
+Handle left: The center of gravity for the screwdriver is -53.3, -9.1
+The direction of the correction is:  correction towardsHandle
+
+		Object =  asymm_garage_screwdriver_mask_left.jpg
+
+Handle right: The center of gravity for the screwdriver is 60.2, -9.7
+Handle left: The center of gravity for the screwdriver is -60.2, -9.7
+The direction of the correction is:  correction towardsHandle
+
+		Object =  asymm_garage_screwdriver_mask_right.jpg
+
+Handle right: The center of gravity for the screwdriver is 52.2, -8.6
+Handle left: The center of gravity for the screwdriver is -52.2, -8.6
+The direction of the correction is:  correction towardsHandle
+
+		Object =  asymm_garage_wrench_mask_control.jpg
+
+Handle right: The center of gravity for the wrench is -18.9, -12.4
+Handle left: The center of gravity for the wrench is 18.9, -12.4
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_garage_wrench_mask_left.jpg
+
+Handle right: The center of gravity for the wrench is -8.4, -13.7
+Handle left: The center of gravity for the wrench is 8.4, -13.7
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_garage_wrench_mask_right.jpg
+
+Handle right: The center of gravity for the wrench is -26.0, -12.5
+Handle left: The center of gravity for the wrench is 26.0, -12.5
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_kitchen_fork_mask_control.jpg
+
+Handle right: The center of gravity for the fork is -28.7, -9.8
+Handle left: The center of gravity for the fork is 28.7, -9.8
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_kitchen_fork_mask_left.jpg
+
+Handle right: The center of gravity for the fork is -24.4, -11.2
+Handle left: The center of gravity for the fork is 24.4, -11.2
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_kitchen_fork_mask_right.jpg
+
+Handle right: The center of gravity for the fork is -26.3, -9.9
+Handle left: The center of gravity for the fork is 26.3, -9.9
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_kitchen_knife_mask_control.jpg
+
+Handle right: The center of gravity for the knife is -6.1, -9.4
+Handle left: The center of gravity for the knife is 6.1, -9.4
+The direction of the correction is:  correction smaller than 8
+
+		Object =  asymm_kitchen_knife_mask_left.jpg
+
+Handle right: The center of gravity for the knife is 4.0, -10.2
+Handle left: The center of gravity for the knife is -4.0, -10.2
+The direction of the correction is:  correction smaller than 8
+
+		Object =  asymm_kitchen_knife_mask_right.jpg
+
+Handle right: The center of gravity for the knife is -10.3, -9.6
+Handle left: The center of gravity for the knife is 10.3, -9.6
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_kitchen_peeler_mask_control.jpg
+
+Handle right: The center of gravity for the peeler is -3.2, -5.3
+Handle left: The center of gravity for the peeler is 3.2, -5.3
+The direction of the correction is:  correction smaller than 8
+
+		Object =  asymm_kitchen_peeler_mask_left.jpg
+
+Handle right: The center of gravity for the peeler is 1.0, -6.2
+Handle left: The center of gravity for the peeler is -1.0, -6.2
+The direction of the correction is:  correction smaller than 8
+
+		Object =  asymm_kitchen_peeler_mask_right.jpg
+
+Handle right: The center of gravity for the peeler is -1.5, -5.5
+Handle left: The center of gravity for the peeler is 1.5, -5.5
+The direction of the correction is:  correction smaller than 8
+
+		Object =  asymm_kitchen_sharpeningsteel_mask_control.jpg
+
+Handle right: The center of gravity for the sharpeningsteel is 22.7, -10.1
+Handle left: The center of gravity for the sharpeningsteel is -22.7, -10.1
+The direction of the correction is:  correction towardsHandle
+
+		Object =  asymm_kitchen_sharpeningsteel_mask_left.jpg
+
+Handle right: The center of gravity for the sharpeningsteel is 37.8, -12.1
+Handle left: The center of gravity for the sharpeningsteel is -37.8, -12.1
+The direction of the correction is:  correction towardsHandle
+
+		Object =  asymm_kitchen_sharpeningsteel_mask_right.jpg
+
+Handle right: The center of gravity for the sharpeningsteel is 22.3, -10.4
+Handle left: The center of gravity for the sharpeningsteel is -22.3, -10.4
+The direction of the correction is:  correction towardsHandle
+
+		Object =  asymm_kitchen_spoon2_mask_control.jpg
+
+Handle right: The center of gravity for the spoon2 is -9.3, -9.0
+Handle left: The center of gravity for the spoon2 is 9.3, -9.0
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_kitchen_spoon2_mask_left.jpg
+
+Handle right: The center of gravity for the spoon2 is 6.3, -9.9
+Handle left: The center of gravity for the spoon2 is -6.3, -9.9
+The direction of the correction is:  correction smaller than 8
+
+		Object =  asymm_kitchen_spoon2_mask_right.jpg
+
+Handle right: The center of gravity for the spoon2 is -14.3, -9.0
+Handle left: The center of gravity for the spoon2 is 14.3, -9.0
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_kitchen_spoon_mask_control.jpg
+
+Handle right: The center of gravity for the spoon is -15.3, -6.1
+Handle left: The center of gravity for the spoon is 15.3, -6.1
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_kitchen_spoon_mask_left.jpg
+
+Handle right: The center of gravity for the spoon is -2.9, -6.8
+Handle left: The center of gravity for the spoon is 2.9, -6.8
+The direction of the correction is:  correction smaller than 8
+
+		Object =  asymm_kitchen_spoon_mask_right.jpg
+
+Handle right: The center of gravity for the spoon is -24.0, -5.4
+Handle left: The center of gravity for the spoon is 24.0, -5.4
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_kitchen_washingbrush_mask_control.jpg
+
+Handle right: The center of gravity for the washingbrush is -32.0, 5.0
+Handle left: The center of gravity for the washingbrush is 32.0, 5.0
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_kitchen_washingbrush_mask_left.jpg
+
+Handle right: The center of gravity for the washingbrush is -27.1, 4.5
+Handle left: The center of gravity for the washingbrush is 27.1, 4.5
+The direction of the correction is:  correction awayHandle
+
+		Object =  asymm_kitchen_washingbrush_mask_right.jpg
+
+Handle right: The center of gravity for the washingbrush is -33.8, 5.3
+Handle left: The center of gravity for the washingbrush is 33.8, 5.3
+The direction of the correction is:  correction awayHandle
+
+		Object =  symm_garage_leveller_mask_control.jpg
+
+Handle right: The center of gravity for the leveller is -8.2, -3.4
+Handle left: The center of gravity for the leveller is 8.2, -3.4
+The direction of the correction is:  correction awayHandle
+
+		Object =  symm_garage_leveller_mask_left.jpg
+
+Handle right: The center of gravity for the leveller is 14.0, -2.7
+Handle left: The center of gravity for the leveller is -14.0, -2.7
+The direction of the correction is:  correction towardsHandle
+
+		Object =  symm_garage_leveller_mask_right.jpg
+
+Handle right: The center of gravity for the leveller is -11.5, -2.3
+Handle left: The center of gravity for the leveller is 11.5, -2.3
+The direction of the correction is:  correction awayHandle
+
+		Object =  symm_garage_ruler_mask_control.jpg
+
+Handle right: The center of gravity for the ruler is -0.4, -6.5
+Handle left: The center of gravity for the ruler is 0.4, -6.5
+The direction of the correction is:  correction smaller than 8
+
+		Object =  symm_garage_ruler_mask_left.jpg
+
+Handle right: The center of gravity for the ruler is 19.3, -7.3
+Handle left: The center of gravity for the ruler is -19.3, -7.3
+The direction of the correction is:  correction towardsHandle
+
+		Object =  symm_garage_ruler_mask_right.jpg
+
+Handle right: The center of gravity for the ruler is -10.5, -5.9
+Handle left: The center of gravity for the ruler is 10.5, -5.9
+The direction of the correction is:  correction awayHandle
+
+		Object =  symm_kitchen_carrot_mask_control.jpg
+
+Handle right: The center of gravity for the carrot is 6.8, -4.0
+Handle left: The center of gravity for the carrot is -6.8, -4.0
+The direction of the correction is:  correction smaller than 8
+
+		Object =  symm_kitchen_carrot_mask_left.jpg
+
+Handle right: The center of gravity for the carrot is 11.7, -4.1
+Handle left: The center of gravity for the carrot is -11.7, -4.1
+The direction of the correction is:  correction towardsHandle
+
+		Object =  symm_kitchen_carrot_mask_right.jpg
+
+Handle right: The center of gravity for the carrot is 7.3, -3.9
+Handle left: The center of gravity for the carrot is -7.3, -3.9
+The direction of the correction is:  correction smaller than 8
+
+		Object =  symm_kitchen_roller_mask_control.jpg
+
+Handle right: The center of gravity for the roller is -3.6, -6.8
+Handle left: The center of gravity for the roller is 3.6, -6.8
+The direction of the correction is:  correction smaller than 8
+
+		Object =  symm_kitchen_roller_mask_left.jpg
+
+Handle right: The center of gravity for the roller is 6.9, -7.2
+Handle left: The center of gravity for the roller is -6.9, -7.2
+The direction of the correction is:  correction smaller than 8
+
+		Object =  symm_kitchen_roller_mask_right.jpg
+
+Handle right: The center of gravity for the roller is -9.7, -6.6
+Handle left: The center of gravity for the roller is 9.7, -6.6
+The direction of the correction is:  correction awayHandle
+

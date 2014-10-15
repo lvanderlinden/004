@@ -1,0 +1,198 @@
+# Stimulus preparation:
+
+See OpenSesame script.
+See also:
+	- `prepare.applyMask.py`
+	- `constants.py`
+
+# Raw-data parsing:
+
+## CoG calculation:
+See `prepare.getCoG.py`
+
+## Normalisation procedure:
+Is done during parsing, see below.
+
+## Parsing of the ASC files:
+
+The data is parsed by running `matrix.ascParser.py`. This creates two data matrices, called 'data_004A_WITH_drift_corr.csv' and 'data_004B_WITH_drift_corr.csv'.
+These unfiltered data matrices are saved in the working directory (/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/analysis)
+TODO
+
+Free parameters in this module (constant across experiments):
+	- drift correction = True (offline driftcorrection is applied to the raw landing positions)
+	- on top of the default EyeLink parameters, I used the following criteria:
+		- only INITIAL saccadic landing positions > 170/2 (irrespective of direciton) are counted. for the subsequent saccadic landing positions no criteria were applied
+		- 170/2 depicts a vertical line in between the fixation point and the minimum eccentricity of the object
+		- no criterion for fixation duration was used
+
+The parsing of the raw data files stops as soon as a manual response is detected.
+	
+## Selection criteria:
+
+### For trials:
+	
+Selection criteria are applied and new column headers (e.g. with clearer names etc.) are created by running `matrix.getDM.py`. This creates two output files called 'selected_dm_004A_WITH_drift_corr.csv' and 'selected_dm_004B_WITH_drift_corr.csv', saved in the working directory (see above). TODO
+
+Selection criteria (constant aross experiments):
+	
+	- practice trials are excluded
+	- trials on which the initial saccade was in the wrong direction (given the visual field of the stimulus)
+	- trials on which the intial-saccade latency was negative
+
+Additional selection criteria exp. 1:
+	
+	- fixation check on fixation dot failed
+	- fixation check on object failed
+	- fixation checks took more than 1000 ms (arbitrary criterion)
+
+Additional selection criteria exp. 2:
+	
+	- Two participants excluded:
+		- SM (doesn't have to be reported, because he was not one of the 18)
+		- DM (because he's left handed)
+
+TODO: In exp 1 one pp did only 5 instead of 6 blocks.
+
+### For saccades:
+
+In the end I decided not the filter only on-object saccades, because we (Sebastiaan and I) reasoned that:
+	
+	1. Applying the least possible filtering is optimal, because then it doesn't sound like we were looking for significance by trying all kinds of selections.
+	2. It is not plausible that participants were really looking at the white background. It's more probable that they did (have the feeling that they) look(ed) at the objects, even though according to the EyeLink coordinates they were not.
+
+However, note that when I do apply on-object selections either on only the x-axis or on both, this doesn't change the pattern of results.	
+
+One selection IS applied to saccades, namely that the landing position of a given saccade (1st, 2nd or 3rd) DOES have a value. This selection is carried out by `onObject.py`.
+
+
+# Statistical analyses:
+See package `analyse`.
+	
+## Affordance effect in manual response:
+See package `affordance`.
+
+Note that for these analyses the same data is used as for the EM data (except that we could of course on filter on landing position 1 having a value and not for the other saccades. No extra filter criteria were used, except for trimming the outliers based on SD. For the response-time variable it's best to use 'RT', because this is from the moment the response-collecting item is called. 
+
+Note: because we had fixation checks in Exp1 but not in Exp2, RT will be much longer in Exp 2.
+
+Run `affordance.py` to obtain:
+	- cross over interaction showing handle by hand effect on RT (`affCros.py`)
+	- deltaplot of effect size as a function of binned RT (`deltaPlot.py`)
+
+
+Note: Although the two-way interaction doesn't look weird in Exp 1 (i.e., somewhat in the predicted direction), the effect of Comp (i.e., a t-test) is revesrsed. I looked at this with Sebastiaan and it seems to be caused by within-subject differences.
+
+For Exp 2 the pattern is in the expected direction, and is more clear for the trials in which at least two EM's were made, than the data in which only one EM was made.
+
+Discussion: 
+	- Time course
+	- In line with Fischer & Dahl: there still IS a slight effect in the correct direction for right hand = LH
+
+Additional free parameter:
+	
+	- several measures for RT are possible. The RT from landing-on-object until manual response is used.
+
+The absence of an affordance effect might be due to:
+	
+	- Task differences between classical studies and ours:
+		- Normally, objects are in foveal vision
+		- Our contrast manipulation was varied within blocks -> carry-over effect?
+		- Our fixation checks messed up the timing (in Exp 1)?
+		- We had filler objects -> maybe it's more a strategy that occurs when it's applicable to all
+			stimuli (even though it doesn't help)
+	- Or simply not enough trials/ participants to detect the effect?
+
+## Effects on landing positions:
+
+See `analyses.py`. 
+
+### Normalisation:
+TODO: perfectioneren -> en dan opnieuw parsen?
+TODO: hoe moet dat als 0 = cog? hoe bepaal ik dan on-object saccades?
+
+### Center of gravity:
+	
+### Normalised landing positions as a function of orientation relative to CoG
+TODO: perfectioneren on-object landing positions
+See `onObject.py`
+
+### Normalised landing positions (pos = towards handle) relative to the center of the bitmap!
+
+#### Initial saccade and subsequent refixations:
+
+##### As a function of handle side:
+	
+Across groups, split per group (heavyHandle versus heavyOther) or split per object.
+See: `landOnHandle.py`
+
+TODO statistical analyses: 
+	
+	- t-tests to see whether these landing positions deviate from zero
+	- t-tests to see whether these landing positions differ from each other
+	- correct for chance
+
+For the landing position analsyses I collapsed across other conditions (hand of response, orientation), 
+because none of these effects
+were significant (see `perFactor()` in `landOnHandle.py`. I did this without correcting for chance
+(which is find in this case, because correcting for chance would result in even higher p-values).
+
+NOTE: there WAS an effect of visual field on ToHandle sacc 1 in Exp 1. Not mentioned because
+not of our interest..??
+
+
+###### As a function of contrast manipulation:
+If this gives straight-forward results, I might as well include it in the paper. But only as a side finding,
+and only discuss it in Exp 3 (the simulation).
+
+
+#### Time course:
+Positive correlation between latency of sacc1 and bias away handle??
+DM's for this test are prepared by dmsRegr.py. The analysis (MEM) will be carried out in R.
+
+
+
+## Simulation:
+	
+	Eye movements on the experimental displays were simulated by running the Itti and Koch saliency model.
+	A fake 'one-participant dm' is made by running `simulationDM.py`.
+		
+	- Simulation itself is carried out by `simulate.py`. Ask Sebastiaan for details.
+	- The one-participant dm is created by `simulationDM.py', and saved in the wd as 'dm_004C_simulation.csv'.
+	- This dm is further filtered by `getDM.py` (although of course not all criteria can be applied). The resulting filtered dm is saved in the wd as 'selected_dm_004C_WITH_drift_corr.csv'.
+	
+### Problems with the simulation model (see individual plots in 'simulation'):
+
+Initial saccades show a huge bias to either side of the object (see also distributions), which is not plausible for objects presented in the periphery. The model does not appear to do any averaging, or to take initial fixation location and stimulus eccentricity (i.e. far in periphery or in (para)foveal vision) into account. As a result, especially the simulated first saccades are not so useful.
+
+Therefore, the average first landing position is not so informative, and should not be taken as an alternative for the CoG. Even caclulating the CoG of the saliency map was not so informative, and still showed a bias TOWARDS the handle??
+
+The simulation IS useful for the second and third refixations.
+
+### Saliency maps:
+- Saliency maps of all original bitmaps are calculated (see './saliency', ask Sebastiaan for more details).
+- The CoG of the resulting maps is calculated by running 'salmap.py'
+
+	
+	
+## Discrepancy with Myachykov et al. (2013):
+
+See `Myach.py`
+Discrepancy between Myachykov et al. (2013) and our results.
+
+One important difference is the dependent variable: Landing positions versus proportional dwell times.
+Although using their exact methods is not a good idea, because
+
+	- subjective: what is handle
+	- not possible for some of our objects to determine the border between handle and 'body'
+
+we try to investigate whether IF the eyes land on the handle, they stay there longer.
+	
+Still, note that their interpretation: handles automatically attract visual attention, is not replicated by us anyway.
+
+Firstly, `mergeDM.py` creates a dm that contains landing position towards handle and fixation duration
+across saccades.
+Next, `Myach.py` uses `regrAn.py` to look at the correlation between landing position towards handle and fix dur, to investigate whether duratio for on-handle saccades are longer than duraton for off-handle saccades.
+Results show: a correlation in the opposite direction: the more towards the handle, the SHORTER fixation durations.
+
+
