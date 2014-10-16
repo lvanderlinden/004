@@ -177,6 +177,11 @@ if __name__ == '__main__':
 			continue
 		stimPath = os.path.join(src, stim)
 		srcIm = ndimage.imread(stimPath)
+		print srcIm.shape
+		srcIm = misc.imresize(srcIm, 0.5)
+		print srcIm.shape
+		#sys.exit()
+		
 		 #ndimage.imread('test/input2.png')]
 		dstStim = np.zeros( (res[0], res[1], 4), dtype=np.uint8)
 		dstStim = createRandomBg(srcIm, dstStim)

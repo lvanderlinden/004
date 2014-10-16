@@ -16,7 +16,20 @@ from scipy import ndimage, interpolate, misc
 from exparser import TraceKit as tk
 from skimage import draw
 
-def matchCog(path, f=1.05, xy=None, th=2, show=False):
+# Size of the bitmaps:
+width = 720
+height = 540
+
+# Centers of the bitmap:
+xCen = width/2
+yCen = height/2
+
+srcOb = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/stimuli/final/objects"
+srcNob = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/stimuli/final/non-objects with texture"
+dstNob = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/stimuli/final/non-objects with texture cog matched"
+
+
+def matchCog(path, f=1.025, xy=None, th=1, show=False):
 
 	"""
 	desc:
@@ -33,11 +46,13 @@ def matchCog(path, f=1.05, xy=None, th=2, show=False):
 		th:		Threshold cog difference (default = 10)
 		show:	Indicates whether a plot should be shown.
 	"""
-
+	
 	_src = ndimage.imread(path)[:,:,:3]	
 	src = np.empty(_src.shape, dtype=np.uint32)
 	src[:] = _src
-
+	orig = src.copy()
+	left = 1.
+	right = 1.
 	while True:				
 		#im = np.array(_src, np.uint32)
 		x, y = cog.cog(src.copy())		
@@ -46,11 +61,14 @@ def matchCog(path, f=1.05, xy=None, th=2, show=False):
 			break
 		print 'Transforming to change CoG!'
 		if x > xy[0]:
-			src = transform(src, left=f, right=1./f)
+			left *= f
+			right /= f
 		else:
-			src = transform(src, left=1./f, right=f)
-		misc.imsave(path+'.cog-correct.jpg', src)
-	misc.imsave(path+'.cog-correct.jpg', src)
+			left /= f
+			right *= f
+		src = transform(orig, left=left, right=right)
+	#misc.imsave(path+'.cog-correct.jpg', src)
+	misc.imsave(os.path.join(dstNob, path), src)
 	xc = src.shape[1]/2
 	yc = src.shape[0]/2
 	if show:
@@ -82,11 +100,15 @@ def transform(im, left=1., right=1.):
 	yc = im.shape[0]/2
 	print 'transform: %.4f - %.4f' % (left, right)
 	transform = np.linspace(left, right, im.shape[1])
+	#plt.plot(transform)
+	#plt.show()
 	for x in range(im.shape[1]):
 		for y in range(im.shape[0]):
 			dy = y-yc
-			y2from = int(yc+transform[x]*dy)
-			y2to = int(yc+transform[x]*(dy+1))
+			#print x, dy
+			y2from = yc+transform[x]*dy
+			y2to = yc+transform[x]*(dy+1)
+			#print '%.2f -> (%.2f:%.2f)' % (y, y2from, y2to)
 			if y2from > 0 and y2to < im2.shape[0]:
 				im2[y2from:y2to,x] = im[y,x]
 	return im2
@@ -94,16 +116,6 @@ def transform(im, left=1., right=1.):
 if __name__ == '__main__':
 
 
-	# Size of the bitmaps:
-	width = 720
-	height = 540
-	
-	# Centers of the bitmap:
-	xCen = width/2
-	yCen = height/2
-
-	srcOb = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/stimuli/final/objects"
-	srcNob = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/stimuli/final/non-objects with texture"
 
 	l = [['img', 'xCogOrig', 'yCogOrig', 'xCogMatch', 'yCogMatch']]
 	for obj in os.listdir(srcOb):
@@ -111,8 +123,7 @@ if __name__ == '__main__':
 			continue
 		if "hammer" in obj:
 			continue
-		nob = "non-%s" % obj
-		
+		nob = "non-%s" % obj		
 		objPath = os.path.join(srcOb, obj)
 		nobPath = os.path.join(srcNob, nob)
 		print 'Original %s' % objPath
