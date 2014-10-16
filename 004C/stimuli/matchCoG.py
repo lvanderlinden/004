@@ -68,10 +68,12 @@ def matchCog(path, f=1.025, xy=None, th=1, show=False):
 			right *= f
 		src = transform(orig, left=left, right=right)
 	#misc.imsave(path+'.cog-correct.jpg', src)
+	pngName = os.path.splitext(os.path.basename(path))[0] + ".png"
 	if "non-object" in path:
-		misc.imsave(os.path.join(dst, os.path.basename(path)), src)
+		
+		misc.imsave(os.path.join(dst, pngName), src)
 	else:
-		misc.imsave(os.path.join(dst, "object_%s" % os.path.basename(path)), src)
+		misc.imsave(os.path.join(dst, "object_%s" % pngName), src)
 	xc = src.shape[1]/2
 	yc = src.shape[0]/2
 	if show:
