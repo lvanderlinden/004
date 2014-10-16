@@ -5,7 +5,7 @@ Create block_loop content
 
 stimList = ["chisel", "chisel2", "mallet", "paintbrush", "screwdriver", \
 	"wrench", "fork", "knife", "peeler", "sharpeningsteel", "spoon", \
-		"spoon2", "washingbrush"]
+		"spoon2", "washingbrush", "hammer"]
 
 f = open("blockloop.csv", "w")
 

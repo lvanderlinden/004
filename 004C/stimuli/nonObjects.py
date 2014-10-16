@@ -2,6 +2,8 @@ import os
 import numpy as np
 from PIL import Image
 import sys
+from random import shuffle
+
 """
 DESCRIPTION:
 Merges shapes for non objects (see shape.py) and textures for non-objects
@@ -33,32 +35,39 @@ def merge():
 	"""
 	
 	srcText = "texture-output-sliced"
-	srcShapes = "final/non-object shapes"
-	dst = "final/non-objects with texture"
-	lMaskMix = os.listdir(srcShapes)
+	srcShapes = "mask-mix"
+	dst = "non-objects with texture"
+	#lMaskMix = os.listdir(srcShapes)
+	#shuffle(lMaskMix)
 	
 	for stim in os.listdir(srcText):
 		
+		#if not "hammer" in stim:
+			#continue
 		stimName = os.path.splitext(stim)[0]
 		
-		nonObject = lMaskMix.pop()
+		#nonObject = lMaskMix.pop()
 		
 		path1 = os.path.join(srcText, stim)
 		img1 = Image.open(path1)
 		a1 = np.asarray(img1)
 		#print type(a1)
 		
-		path2 = os.path.join(srcShapes, nonObject)
+		path2 = os.path.join(srcShapes, stim)
 		img2 = Image.open(path2)
 		a2 = np.asarray(img2)
 		#print np.unique(a2), a2.dtype
+		
+		print path1
+		print path2
+		
 		
 		aFinal = a1.copy()
 		#for channel in range(3):
 		#	aFinal[:,:,channel] = aFinal[:,:,channel]*(a2/255)
 		aFinal[np.where(a2 != 255)] = 255
 		imFinal = Image.fromarray(aFinal)
-		imFinal.save(os.path.join(dst,"%s.jpg" % stimName))
+		imFinal.save(os.path.join(dst,"non-object_%s.jpg" % stimName))
 		#sys.exit()
 		
 if __name__ == "__main__":

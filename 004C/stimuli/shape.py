@@ -176,7 +176,7 @@ if __name__ == '__main__':
 		lr.append(r)
 
 	ar = np.array(lr)
-	for i in range(50):
+	for i in range(200):
 		print 'mix-mask %d' % i
 		sar = ar[np.random.choice(ar.shape[0], 2)]
 		im = fromRadialShape(a, sar.mean(axis=0), im.shape)

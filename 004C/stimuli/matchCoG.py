@@ -24,12 +24,12 @@ height = 540
 xCen = width/2
 yCen = height/2
 
-srcOb = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/stimuli/final/objects"
-srcNob = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/stimuli/final/non-objects with texture"
-dstNob = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/stimuli/final/non-objects with texture cog matched"
+srcOb = "src"
+srcNob = "non-objects with texture"
+dstNob = "final"
 
 
-def matchCog(path, f=1.025, xy=None, th=1, show=False):
+def matchCog(path, f=1.25, xy=None, th=5, show=False):
 
 	"""
 	desc:
@@ -62,13 +62,13 @@ def matchCog(path, f=1.025, xy=None, th=1, show=False):
 		print 'Transforming to change CoG!'
 		if x > xy[0]:
 			left *= f
-			right /= f
+			right /= f**2
 		else:
-			left /= f
+			left /= f**2
 			right *= f
 		src = transform(orig, left=left, right=right)
 	#misc.imsave(path+'.cog-correct.jpg', src)
-	misc.imsave(os.path.join(dstNob, path), src)
+	misc.imsave(os.path.join(dstNob, os.path.basename(path)), src)
 	xc = src.shape[1]/2
 	yc = src.shape[0]/2
 	if show:
@@ -95,6 +95,8 @@ def transform(im, left=1., right=1.):
 		right:	The right thickness.
 	"""
 
+	left = min(3., left)
+	right = min(3., right)
 	im2 = np.empty(im.shape, dtype=im.dtype)
 	im2[:] = 255
 	yc = im.shape[0]/2
@@ -121,9 +123,7 @@ if __name__ == '__main__':
 	for obj in os.listdir(srcOb):
 		if "png" in obj or 'cog-correct' in obj:
 			continue
-		if "hammer" in obj:
-			continue
-		nob = "non-%s" % obj		
+		nob = "non-object_%s" % obj		
 		objPath = os.path.join(srcOb, obj)
 		nobPath = os.path.join(srcNob, nob)
 		print 'Original %s' % objPath
