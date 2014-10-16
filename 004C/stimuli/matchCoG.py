@@ -26,10 +26,10 @@ yCen = height/2
 
 srcOb = "src"
 srcNob = "non-objects with texture"
-dstNob = "final"
+dst = "final"
 
 
-def matchCog(path, f=1.25, xy=None, th=5, show=False):
+def matchCog(path, f=1.025, xy=None, th=1, show=False):
 
 	"""
 	desc:
@@ -56,10 +56,10 @@ def matchCog(path, f=1.25, xy=None, th=5, show=False):
 	while True:				
 		#im = np.array(_src, np.uint32)
 		x, y = cog.cog(src.copy())		
-		print 'COG = %.2f, %.2f' % (x, y)
+		print '	COG = %.2f, %.2f' % (x, y)
 		if xy == None or abs(x-xy[0]) < th:
 			break
-		print 'Transforming to change CoG!'
+		print '	Transforming to change CoG!'
 		if x > xy[0]:
 			left *= f
 			right /= f**2
@@ -68,7 +68,10 @@ def matchCog(path, f=1.25, xy=None, th=5, show=False):
 			right *= f
 		src = transform(orig, left=left, right=right)
 	#misc.imsave(path+'.cog-correct.jpg', src)
-	misc.imsave(os.path.join(dstNob, os.path.basename(path)), src)
+	if "non-object" in path:
+		misc.imsave(os.path.join(dst, os.path.basename(path)), src)
+	else:
+		misc.imsave(os.path.join(dst, "object_%s" % os.path.basename(path)), src)
 	xc = src.shape[1]/2
 	yc = src.shape[0]/2
 	if show:
@@ -100,7 +103,7 @@ def transform(im, left=1., right=1.):
 	im2 = np.empty(im.shape, dtype=im.dtype)
 	im2[:] = 255
 	yc = im.shape[0]/2
-	print 'transform: %.4f - %.4f' % (left, right)
+	print '	transform: %.4f - %.4f' % (left, right)
 	transform = np.linspace(left, right, im.shape[1])
 	#plt.plot(transform)
 	#plt.show()
@@ -121,14 +124,18 @@ if __name__ == '__main__':
 
 	l = [['img', 'xCogOrig', 'yCogOrig', 'xCogMatch', 'yCogMatch']]
 	for obj in os.listdir(srcOb):
+		
+		#if not "paintbrush" in obj:
+		#	continue
 		if "png" in obj or 'cog-correct' in obj:
 			continue
 		nob = "non-object_%s" % obj		
 		objPath = os.path.join(srcOb, obj)
 		nobPath = os.path.join(srcNob, nob)
+		print
 		print 'Original %s' % objPath
 		x, y = matchCog(objPath)
-		#print "cog = ", x
+		print "COG original object = ", x
 		#sys.exit()
 		
 		print 'Match %s' % nobPath

@@ -24,7 +24,7 @@ fOld = "old_cog_dict.csv"
 
 stimList = ["chisel", "chisel2", "mallet", "paintbrush", "screwdriver", \
 	"wrench", "fork", "knife", "peeler", "sharpeningsteel", "spoon", \
-		"spoon2", "washingbrush"]
+		"spoon2", "washingbrush", "hammer"]
 
 src = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/stimuli/final/objects"
 
