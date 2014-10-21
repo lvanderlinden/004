@@ -161,7 +161,8 @@ def parseAsc(driftCorr = False):
 						driftcorrection. Set to False, because ONLINE
 						drift correction was activated in OpenSesame
 	"""
-	dm = MyReader(maxN=None, acceptNonMatchingColumns = True) \
+	dm = MyReader(maxN=None, acceptNonMatchingColumns = True, \
+		path = "data/asc") \
 		.dataMatrix()
 		
 	return dm
