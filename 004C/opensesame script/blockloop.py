@@ -20,19 +20,18 @@ for direction in [-20, 0, 20]:
 	for stimType in ["object", "non-object"]:
 		for flip in ["left", "right"]:
 			for vf in ["upper","lower"]:
-				for gap in ["zero", "overlap"]:
-					for stim in stimList:
-						_dm = dm.select("stim_type == '%s'" % stimType)
-						_dm = _dm.select("name == '%s'" % stim)
-						assert(len(_dm)==1)
-						cog = _dm["xCoG"][0]
-						if flip == "left":
-							cog = cog * -1
-						
-						print "object = ", stim
-						print "flip = ", flip
-						print "cog = ", cog
-						#raw_input()
-						f.write(",".join([str(direction), \
-							stimType, flip, vf, gap, stim, str(cog)]) + "\n")
+				for stim in stimList:
+					_dm = dm.select("stim_type == '%s'" % stimType)
+					_dm = _dm.select("name == '%s'" % stim)
+					assert(len(_dm)==1)
+					cog = _dm["xCoG"][0]
+					if flip == "left":
+						cog = cog * -1
+					
+					print "object = ", stim
+					print "flip = ", flip
+					print "cog = ", cog
+					#raw_input()
+					f.write(",".join([str(direction), \
+						stimType, flip, vf, stim, str(cog)]) + "\n")
 f.close()
