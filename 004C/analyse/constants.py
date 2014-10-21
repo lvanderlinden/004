@@ -11,7 +11,18 @@ h = 768
 xCen = w/2
 yCen = h/2
 
+print xCen
+print yCen
+
 srcStim = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/opensesame script"
 
-eccPx = 272
-minSaccSize = eccPx/2
+# The y position of the eyes should be at least 2 degrees (?) from the 
+# center of the display
+
+# TODO: Change for new ecc:
+minYDistFromFix = 2 * ratio
+thLower = yCen - minYDistFromFix
+thUpper =  yCen + minYDistFromFix
+
+print "Lower = ", thLower
+print "Upper = ", thUpper

@@ -30,6 +30,8 @@ def relToCenter(x,y,plot=False):
 	_y = y-constants.yCen
 	
 	if plot:
+		fig = plt.figure()
+		plt.suptitle("relative to center")
 		plt.subplot(211)
 		plt.scatter(x,y, color = "red", label = "start")
 		plt.xlim(0,constants.w)
@@ -68,6 +70,7 @@ def relToFlip(x,y, flip, plot = True):
 		yFlip = y
 		
 	if plot:
+		fig = plt.figure()
 		plt.title("flip = %s" % flip)
 		plt.scatter(x,y, color = "blue", label = "start")
 		plt.scatter(xFlip,yFlip, color = "red", label = "end")

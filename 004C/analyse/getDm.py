@@ -26,13 +26,16 @@ object size and orientation
 
 
 @cachedDataMatrix
-def addCoord(dm):
+def addCoord(dm, plot = False):
 	
 	"""
 	Adds coordinates to dm
 	
 	Arguments:
 	dm		--- A datamatrix instance.
+	
+	Keyword arguments:
+	plot	--- Boolean indicating whether or not to show some debug plots
 	"""
 	
 	# Add col headers:
@@ -68,19 +71,12 @@ def addCoord(dm):
 		dm["stimFile"][i] = stimFile
 		dm["xCogScaled"][i] = xCogScaled
 		
-		xStimRot, yStimRot = rotate.rotate(xStim, yStim, aRot, plot = False)
-		dm["xStimRot"][i] = xStimRot
-		dm["yStimRot"][i] = yStimRot
-		
 		wBoxScaled, hBoxScaled = bbox.bbox(stimFile)
 		dm["wBoxScaled"][i] = wBoxScaled
 		dm["hBoxScaled"][i] = hBoxScaled
 		
 		vf = dm["visual_field"][i]
 		flip = dm["flip"][i]
-		
-		if dm["flip"][i] == "right":
-			continue
 		
 		print "vf = ", vf
 		print "flip = ", flip
@@ -97,12 +93,13 @@ def addCoord(dm):
 			x = dm["fix%s_x" % fix][i]
 			y = dm["fix%s_y" % fix][i]
 			
-			xNormOnCenter, yNormOnCenter = norm.relToCenter(x, y,plot=False)
+			xNormOnCenter, yNormOnCenter = norm.relToCenter(x, y,plot=plot)
 			print "LP RELATIVE TO CENTER"
 			print "	x = ", xNormOnCenter
 			print "	y = ", yNormOnCenter
 			
-			xRot, yRot= rotate.rotate(xNormOnCenter,yNormOnCenter, aRot,plot=False)
+			xRot, yRot= rotate.rotate(xNormOnCenter,yNormOnCenter, \
+				aRot,plot=plot)
 			
 			dm["xRot%s" % fix][i] = xRot
 			dm["yRot%s" % fix][i] = yRot
@@ -115,7 +112,7 @@ def addCoord(dm):
 			print "	y = ", yRot
 			
 			xNormOnFlip, yNormOnFlip = norm.relToFlip(xRot, \
-				yRot,flip, plot=False)
+				yRot,flip, plot=plot)
 			print "LP RELATIVE TO FLIP"
 			print "	x = ", xNormOnFlip
 			print "	y = ", yNormOnFlip
@@ -153,49 +150,5 @@ def addLat(dm):
 	#print dm["saccLat1"]
 	
 	return dm		
-if __name__ == "__main__":
-	
-	dm = parse.parseAsc(cacheId = "parsed")
-	dm = addCoord(dm,cacheId = "with_coord")
-	dm = addLat(dm, cacheId = "with_lat")
-	
-	# GAP:
-	dm = dm.select("saccLat1 != ''")
-	dm = dm.select("saccLat1 > 0")
-	
-	for fix in range(1, int(max(dm["fixCount"])) +1):
-		
-		fig = plt.figure()
-		_dm = dm.select("xNorm%s != ''" % fix)
-		_dm = _dm.select("xNorm%s != -1000" % fix)
-		
-		for stimType in dm.unique("stim_type"):
-			__dm = _dm.select("stim_type == '%s'" % stimType)
-			plt.hist(__dm["xNorm%s" % fix], bins = 50, label = stimType, alpha = .5)
-		plt.legend()
-		plt.savefig("lp%s.png" % fix)
-	
-	
-	#for gap in dm.unique("gap"):
-		#_dm = dm.select("gap == '%s'" % gap)
-		#plt.hist(_dm["saccLat1"], bins = 50, label = gap, alpha = .5)
-	#plt.savefig("gap.png")
-	
-	
-	
-	
-	#dm = dm.select("xNorm1 != ''")
-	#dm = dm.select("xNorm1 != 0")
-	#dm = dm.select("xNorm1 != -1000")
-	#pm = PivotMatrix(dm, ["stim_type"], ["file"], "xNorm1", colsWithin = True)
-	#pm.linePlot()
-	#plt.show()
-		
-	#dm = dm.addField("binnedSaccLat")
-	#dm = dm.calcPerc("saccLat1", "binnedSaccLat", keys = ["file"], nBin = 5)
-	
-	#pm = PivotMatrix(dm, ["binnedSaccLat"], ["file"], "xNorm1")
-	#pm.linePlot()
-	#plt.show()
-	
+
 	

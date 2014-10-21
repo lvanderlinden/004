@@ -97,9 +97,13 @@ class MyReader(EyelinkAscFolderReader):
 			# latencies):
 			self.stimOnset = l[1]
 
-			# After stimulus presentation, start searching for a saccade:
-			self.waitForSacc = True
+			# TODO:
+			# After stimulus presentation, start searching for fixations and 
+			# saccades
+			#self.waitForSacc = True
+			self.waitForFix = True
 		
+		# TODO TODO TODO: CHECK!
 		# Below is different than 008B, because here we don't know the response
 		# onset yet when parsing. So only the criteria relative to stimulus
 		# onset are used.
@@ -107,34 +111,36 @@ class MyReader(EyelinkAscFolderReader):
 
 			fix = self.toFixation(l)
 			if fix != None:
-	
-				# Fixation should end after stimulus onset.
-				if fix["eTime"] >= self.stimOnset:				
-				
-					self.fixCount +=1
+
+				# The y coordinate of the fixation position should have
+				# a certain distance from the fixation dot:
+				if fix['y'] > constants.thUpper or fix["y"] < constants.thLower:
 					
-					# Save all available sacc info:
-					for i in fix:
-						trialDict["fix%s_%s" % (self.fixCount, i)] = fix[i]
+					# Fixation should end after stimulus onset.
+					if fix["eTime"] >= self.stimOnset:				
+					
+						self.fixCount +=1
+						
+						# Save all available sacc info:
+						for i in fix:
+							trialDict["fix%s_%s" % (self.fixCount, i)] = fix[i]
 						
 					#self.waitForSacc = True		
 						
-		
-		if self.waitForSacc:
-			sacc = self.toSaccade(l)
+		# TODO: is it a good idea to not look at saccades at all?
+		#if self.waitForSacc:
+			#sacc = self.toSaccade(l)
 			
-			if sacc != None:
-				
-				if sacc["size"] > constants.minSaccSize:
-				
-					# Saccade should start after stimulus onset:
-					if sacc["sTime"] >= self.stimOnset:
-						self.saccCount +=1
-						
-						# Save all available sacc info:
-						for i in sacc:
-							trialDict["sacc%s_%s" % (self.saccCount, i)] = sacc[i]
-						self.waitForFix = True
+			#if sacc != None:
+			
+				## Saccade should start after stimulus onset:
+				#if sacc["sTime"] >= self.stimOnset:
+					#self.saccCount +=1
+					
+					## Save all available sacc info:
+					#for i in sacc:
+						#trialDict["sacc%s_%s" % (self.saccCount, i)] = sacc[i]
+					##self.waitForFix = True
 		
 		# Determine RT by taking stim onset 
 		# (rather than the absolute trial onset) into account:

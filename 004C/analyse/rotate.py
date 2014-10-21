@@ -34,6 +34,8 @@ def rotate(x,y,a, plot=False):
 	yRot = (x*math.sin(_a)) + (y*math.cos(_a))
 	
 	if plot:
+		fig = plt.figure()
+		plt.title("rotate %s degrees" % a)
 		plt.scatter(x,y, label = "original")
 		plt.scatter(xRot, yRot, color = "red", label = "rotated")
 		plt.axvline(0)
