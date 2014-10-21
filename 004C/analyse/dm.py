@@ -17,9 +17,7 @@ from exparser.Cache import cachedDataMatrix, cachedArray
 Prepare DVs for statistical analyses: LP relative to CoG, normalized for 
 object size and orientation
 
-1. Rotate landing positions as if all objects were shown on the vertical 
-meridian.
-
+1. Normalize LP's relative to 
 2. Flip landing positions as if handle was always on the right side.
 
 3. Normalize objects on width
