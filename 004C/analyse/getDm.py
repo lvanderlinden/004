@@ -6,7 +6,9 @@ from matplotlib import pyplot as plt
 import bbox
 import rotate
 import parse
-import norm
+import flip
+import normOnWidth
+import centralOrigin
 from exparser.DataMatrix import DataMatrix
 from exparser.PivotMatrix import PivotMatrix
 from exparser.EyelinkAscFolderReader import EyelinkAscFolderReader
@@ -45,9 +47,6 @@ def addCoord(dm, plot = False):
 		dm = dm.addField("xNorm%s" % fix, default = -1000)
 		dm = dm.addField("yNorm%s" % fix, default = -1000)
 
-	dm = dm.addField("aRot")
-	dm = dm.addField("xStimRot")
-	dm = dm.addField("yStimRot")
 	dm = dm.addField("wBoxScaled")
 	dm = dm.addField("hBoxScaled")
 	dm = dm.addField("xCogScaled")
@@ -59,66 +58,56 @@ def addCoord(dm, plot = False):
 	for i in dm.range():
 		
 		# Get file info:
-		stimFile = "%s_%s.png" % (dm["stim_type"][i], dm["stim_name"][i])
 		aRot = dm["realAngle"][i]
 		ecc = dm["ecc"][i]
 		xStim = dm["xStim"][i]
 		yStim = dm["yStim"][i]
 		xCog = dm["xCog"][i]
-		xCogScaled = xCog/3
+		vf = dm["visual_field"][i]
+		flipCond = dm["flip"][i]
 		
 		# Log new info:
+		# PNG name:
+		stimFile = "%s_%s.png" % (dm["stim_type"][i], dm["stim_name"][i])
 		dm["stimFile"][i] = stimFile
+		
+		# Scaled cog:
+		xCogScaled = xCog/3
 		dm["xCogScaled"][i] = xCogScaled
 		
+		# Size bounding box
 		wBoxScaled, hBoxScaled = bbox.bbox(stimFile)
 		dm["wBoxScaled"][i] = wBoxScaled
 		dm["hBoxScaled"][i] = hBoxScaled
-		
-		vf = dm["visual_field"][i]
-		flip = dm["flip"][i]
-		
-		print "vf = ", vf
-		print "flip = ", flip
-		print "real angle = ", dm["realAngle"][i]
-		print "ecc = ", dm["ecc"][i]
-		print "xCoG = ", xCog
-		print "xCoG scaled = ", xCogScaled
-		
 		
 		# Walk through fixations within trial:
 		fixTot = int(dm["fixCount"][i])
 
 		for fix in range(1,fixTot +1):
+			
+			# Get raw coordinates:
 			x = dm["fix%s_x" % fix][i]
 			y = dm["fix%s_y" % fix][i]
 			
-			xNormOnCenter, yNormOnCenter = norm.relToCenter(x, y,plot=plot)
-			print "LP RELATIVE TO CENTER"
-			print "	x = ", xNormOnCenter
-			print "	y = ", yNormOnCenter
+			# Normalize such that origin = (0,0):
+			xNormOnCenter, yNormOnCenter = centralOrigin.centralOrigin(x, y,plot=plot)
 			
+			# Rotate as if object was presented at -90 in UVF:
 			xRot, yRot= rotate.rotate(xNormOnCenter,yNormOnCenter, \
 				aRot,plot=plot)
 			
+			# Normalize on orientation, as if handle was always to the right.
+			# TODO: check!!!
+			xNormOnFlip, yNormOnFlip = flip.flip(xRot, \
+				yRot,flipCond, plot=plot)
+			
+			# Normalize on object width:
+			xNormOnWidth, yNormOnWidth = normOnWidth.normOnWidth(xNormOnFlip, 
+				yNormOnFlip, wBoxScaled, hBoxScaled)
+
+			# Save new variables:
 			dm["xRot%s" % fix][i] = xRot
 			dm["yRot%s" % fix][i] = yRot
-			
-			print "LP UNROTATED"
-			print "	x = ", x
-			print "	y = ", y
-			print "LP ROTATED"
-			print "	x = ", xRot
-			print "	y = ", yRot
-			
-			xNormOnFlip, yNormOnFlip = norm.relToFlip(xRot, \
-				yRot,flip, plot=plot)
-			print "LP RELATIVE TO FLIP"
-			print "	x = ", xNormOnFlip
-			print "	y = ", yNormOnFlip
-			
-			xNormOnWidth, yNormOnWidth = norm.normOnWidth(xNormOnFlip, 
-				yNormOnFlip, wBoxScaled, hBoxScaled)
 			dm["xNorm%s" % fix][i] = xNormOnWidth
 			dm["yNorm%s" % fix][i] = yNormOnWidth
 	return dm

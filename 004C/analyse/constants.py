@@ -11,9 +11,6 @@ h = 768
 xCen = w/2
 yCen = h/2
 
-print xCen
-print yCen
-
 srcStim = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/opensesame script"
 
 # The y position of the eyes should be at least 2 degrees (?) from the 
@@ -24,5 +21,3 @@ minYDistFromFix = 2 * ratio
 thLower = yCen - minYDistFromFix
 thUpper =  yCen + minYDistFromFix
 
-print "Lower = ", thLower
-print "Upper = ", thUpper

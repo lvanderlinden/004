@@ -41,13 +41,9 @@ class MyReader(EyelinkAscFolderReader):
 		"""
 
 		# Set starting values:
-		self.waitForSacc = False
 		#self.stimOnset = None
 		self.waitForFix = False
-		self.saccOnset = None
-		#self.rt = None
 		
-		self.saccCount = 0
 		self.fixCount = 0
 
 		# Make column headers where, in princicpe, the data from 10 saccades
@@ -55,6 +51,7 @@ class MyReader(EyelinkAscFolderReader):
 		# Note that we have to do this because only the intersection of 
 		# column headers is retained when merging pp DMs:
 		for i in range(1,11):
+			# TODO: I can remove the 'sacc' part
 			for event in ["sacc", "fix"]:
 				for prop in ["duration", "eTime", "x", "y", "ex", "ey", \
 					"sTime", "size", "sx", "sy"]:
@@ -100,7 +97,6 @@ class MyReader(EyelinkAscFolderReader):
 			# TODO:
 			# After stimulus presentation, start searching for fixations and 
 			# saccades
-			#self.waitForSacc = True
 			self.waitForFix = True
 		
 		# TODO TODO TODO: CHECK!
@@ -125,22 +121,6 @@ class MyReader(EyelinkAscFolderReader):
 						for i in fix:
 							trialDict["fix%s_%s" % (self.fixCount, i)] = fix[i]
 						
-					#self.waitForSacc = True		
-						
-		# TODO: is it a good idea to not look at saccades at all?
-		#if self.waitForSacc:
-			#sacc = self.toSaccade(l)
-			
-			#if sacc != None:
-			
-				## Saccade should start after stimulus onset:
-				#if sacc["sTime"] >= self.stimOnset:
-					#self.saccCount +=1
-					
-					## Save all available sacc info:
-					#for i in sacc:
-						#trialDict["sacc%s_%s" % (self.saccCount, i)] = sacc[i]
-					##self.waitForFix = True
 		
 		# Determine RT by taking stim onset 
 		# (rather than the absolute trial onset) into account:
@@ -149,8 +129,7 @@ class MyReader(EyelinkAscFolderReader):
 			trialDict['rtOnset'] = l[1]
 			trialDict['RT'] = l[1] - self.stimOnset
 			
-			# Stop waiting for saccade:
-			self.waitForSacc = False
+			# Stop waiting for fixations:
 			self.waitForFix = False
 			
 
@@ -168,24 +147,9 @@ class MyReader(EyelinkAscFolderReader):
 		"""
 
 		# Write some variables to dict
-		trialDict["saccCount"] = self.saccCount
 		trialDict["fixCount"] = self.fixCount
-		print self.saccCount, self.fixCount
 		print trialDict["file"], trialDict["count_trial_sequence"]
-		
-		#print "trial count = ", trialDict["count_trial_sequence"]
-		
-		# TODO: not sure about this reasoning because we used different criteria
-		# compared to 008B (only based on stim onset, not on response onset)
-		## In theory, there always be should be one more fixation than a saccade,
-		## unless there were no saccades nor fixations detected, or there was
-		## a fixation that started within the SR interval but never ended.
-		## The latter was checked by hand, which is why the assertion below
-		## is still save.
-		#assert(self.saccCount in (0, self.fixCount-1, self.fixCount))
-		#if self.saccCount == self.fixCount and self.saccCount != 0:
-			#raw_input()
-
+	
 @cachedDataMatrix
 def parseAsc(driftCorr = False):
 
