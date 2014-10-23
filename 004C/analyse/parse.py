@@ -5,6 +5,10 @@
 """
 DESCRIPTION:
 From samples to dm with one trial per row.
+
+Note that we use saccade events instead of fixation events. This is because
+it often occurred that a fixation started but not ended (before the 
+stop-recording item), which is why we loose a lot of trials.
 """
 
 import sys
@@ -42,37 +46,18 @@ class MyReader(EyelinkAscFolderReader):
 
 		# Set starting values:
 		#self.stimOnset = None
-		self.waitForFix = False
+		self.waitForSacc= False
 		
-		self.fixCount = 0
+		self.saccCount = 0
 
 		# Make column headers where, in princicpe, the data from 10 saccades
 		# can be saved.
 		# Note that we have to do this because only the intersection of 
 		# column headers is retained when merging pp DMs:
 		for i in range(1,11):
-			# TODO: I can remove the 'sacc' part
-			for event in ["sacc", "fix"]:
-				for prop in ["duration", "eTime", "x", "y", "ex", "ey", \
-					"sTime", "size", "sx", "sy"]:
-					trialDict["%s%s_%s" % (event,i, prop)] = -1000
-	
-	def startTrial(self, l):
-		
-		"""
-		Determines whether a list corresponds to the start of a trial
-		"""
-	
-		# MSG	6343114 start_trial 2
-		if len(l) == 4 and l[0] == 'MSG' and "start_trial" in l[2]:
-			
-			# Remember trial count:
-			self.trialCount = l[2].split("_")[-1]
-			
-			return True			
-		
-		return None
-
+			for prop in ["duration", "eTime", "ex", "ey", \
+				"sTime", "size", "sx", "sy"]:
+				trialDict["sacc%s_%s" % (i, prop)] = -1000
 		
 	def parseLine(self, trialDict, l):
 		
@@ -89,37 +74,31 @@ class MyReader(EyelinkAscFolderReader):
 			#print "yes"
 			#sys.exit()
 			trialDict['stim_onset'] = l[1]
+			self.tracePhase = 'stim'
 			
 			# The time stamp of the stimulus (necessary for calculating 
 			# latencies):
 			self.stimOnset = l[1]
 
-			# TODO:
-			# After stimulus presentation, start searching for fixations and 
-			# saccades
-			self.waitForFix = True
+			self.waitForSacc = True
 		
-		# TODO TODO TODO: CHECK!
-		# Below is different than 008B, because here we don't know the response
-		# onset yet when parsing. So only the criteria relative to stimulus
-		# onset are used.
-		if self.waitForFix:
+		if self.waitForSacc:
 
-			fix = self.toFixation(l)
-			if fix != None:
+			sacc = self.toSaccade(l)
+			if sacc != None:
 
 				# The y coordinate of the fixation position should have
 				# a certain distance from the fixation dot:
-				if fix['y'] > constants.thUpper or fix["y"] < constants.thLower:
+				if sacc['ey'] > constants.thUpper or sacc["ey"] < constants.thLower:
 					
 					# Fixation should end after stimulus onset.
-					if fix["eTime"] >= self.stimOnset:				
+					if sacc["eTime"] >= self.stimOnset:				
 					
-						self.fixCount +=1
+						self.saccCount +=1
 						
 						# Save all available sacc info:
-						for i in fix:
-							trialDict["fix%s_%s" % (self.fixCount, i)] = fix[i]
+						for i in sacc:
+							trialDict["sacc%s_%s" % (self.saccCount, i)] = sacc[i]
 						
 		
 		# Determine RT by taking stim onset 
@@ -130,9 +109,8 @@ class MyReader(EyelinkAscFolderReader):
 			trialDict['RT'] = l[1] - self.stimOnset
 			
 			# Stop waiting for fixations:
-			self.waitForFix = False
-			
-
+			self.waitForSacc = False
+			self.tracePhase = None
 
 
 
@@ -147,9 +125,10 @@ class MyReader(EyelinkAscFolderReader):
 		"""
 
 		# Write some variables to dict
-		trialDict["fixCount"] = self.fixCount
-		print trialDict["file"], trialDict["count_trial_sequence"]
-	
+		trialDict["saccCount"] = self.saccCount
+		print trialDict["file"], trialDict["count_trial_sequence"], \
+			trialDict['saccCount'], trialDict['trialId']
+		
 @cachedDataMatrix
 def parseAsc(driftCorr = False):
 

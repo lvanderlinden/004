@@ -36,14 +36,6 @@ def bbox(stim, plot = False):
 	wBoxScaled = wBox/constants.scale
 	hBoxScaled = wBoxScaled/aspectRatio
 
-	print "Unscaled"
-	print "w = ", wBox
-	print "h = ", hBox
-	print "Scaled:"
-	print "w = ", wBoxScaled
-	print "h = ", hBoxScaled
-
-
 	if plot:
 		plt.imshow(im)
 		plt.axvline(left)

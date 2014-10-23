@@ -1,8 +1,16 @@
+"""
+DESCRIPTION:
+Prepare DVs for statistical analyses: LP relative to CoG, normalized for 
+object size and orientation
+"""
+
+
 import sys
 import os
 import numpy as np
 from matplotlib import pyplot as plt
 
+import constants
 import bbox
 import rotate
 import parse
@@ -15,17 +23,8 @@ from exparser.EyelinkAscFolderReader import EyelinkAscFolderReader
 from exparser.CsvReader import CsvReader
 from exparser.Cache import cachedDataMatrix, cachedArray
 
-"""
-Prepare DVs for statistical analyses: LP relative to CoG, normalized for 
-object size and orientation
 
-1. Normalize LP's relative to 
-2. Flip landing positions as if handle was always on the right side.
-
-3. Normalize objects on width
-
-"""
-
+# TODO: addVars
 
 @cachedDataMatrix
 def addCoord(dm, plot = False):
@@ -40,20 +39,24 @@ def addCoord(dm, plot = False):
 	plot	--- Boolean indicating whether or not to show some debug plots
 	"""
 	
+	
 	# Add col headers:
-	for fix in range(1, max(dm["fixCount"]) + 1):
-		dm = dm.addField("xRot%s" % fix, default = -1000)
-		dm = dm.addField("yRot%s" % fix, default = -1000)
-		dm = dm.addField("xNorm%s" % fix, default = -1000)
-		dm = dm.addField("yNorm%s" % fix, default = -1000)
+	for sacc in range(1, int(max(dm["saccCount"])) + 1):
+		dm = dm.addField("xRot%s" % sacc, default = -1000)
+		dm = dm.addField("yRot%s" % sacc, default = -1000)
+		dm = dm.addField("xNorm%s" % sacc, default = -1000)
+		dm = dm.addField("yNorm%s" % sacc, default = -1000)
 
 	dm = dm.addField("wBoxScaled")
 	dm = dm.addField("hBoxScaled")
 	dm = dm.addField("xCogScaled")
+	dm = dm.addField("xCogScaledDegr")
 	dm = dm.addField("stimFile", dtype = str)
 	dm = dm.addField("xNormOnCenter")
 	dm = dm.addField("yNormOnCenter")
 
+
+	count = 0
 	# Walk through trials:
 	for i in dm.range():
 		
@@ -75,19 +78,24 @@ def addCoord(dm, plot = False):
 		xCogScaled = xCog/3
 		dm["xCogScaled"][i] = xCogScaled
 		
+		# Scaled cog in degrees:
+		xCogScaledDegr = xCogScaled/constants.ratio
+		dm["xCogScaledDegr"][i] = xCogScaledDegr
+		
+		
 		# Size bounding box
 		wBoxScaled, hBoxScaled = bbox.bbox(stimFile)
 		dm["wBoxScaled"][i] = wBoxScaled
 		dm["hBoxScaled"][i] = hBoxScaled
 		
 		# Walk through fixations within trial:
-		fixTot = int(dm["fixCount"][i])
+		saccTot = int(dm["saccCount"][i])
 
-		for fix in range(1,fixTot +1):
+		for sacc in range(1,saccTot +1):
 			
 			# Get raw coordinates:
-			x = dm["fix%s_x" % fix][i]
-			y = dm["fix%s_y" % fix][i]
+			x = dm["sacc%s_ex" % sacc][i]
+			y = dm["sacc%s_ey" % sacc][i]
 			
 			# Normalize such that origin = (0,0):
 			xNormOnCenter, yNormOnCenter = centralOrigin.centralOrigin(x, y,plot=plot)
@@ -106,10 +114,10 @@ def addCoord(dm, plot = False):
 				yNormOnFlip, wBoxScaled, hBoxScaled)
 
 			# Save new variables:
-			dm["xRot%s" % fix][i] = xRot
-			dm["yRot%s" % fix][i] = yRot
-			dm["xNorm%s" % fix][i] = xNormOnWidth
-			dm["yNorm%s" % fix][i] = yNormOnWidth
+			dm["xRot%s" % sacc][i] = xRot
+			dm["yRot%s" % sacc][i] = yRot
+			dm["xNorm%s" % sacc][i] = xNormOnWidth
+			dm["yNorm%s" % sacc][i] = yNormOnWidth
 	return dm
 
 @cachedDataMatrix
@@ -121,22 +129,23 @@ def addLat(dm):
 	Arguments:
 	dm		--- A datamatrix instance.
 	"""
+	count = 0
 	
 	# Add col headers:
-	for fix in range(1, int(max(dm["fixCount"])) + 1):
-		dm = dm.addField("saccLat%s" % fix)
-		
+	for sacc in range(1, int(max(dm["saccCount"])) + 1):
+		dm = dm.addField("saccLat%s" % sacc)
+	
+	
 	# Walk through trials:
 	for i in dm.range():
 		stimOnset = dm["stim_onset"][i]
-		fixTot = int(dm["fixCount"][i])
+		saccTot = int(dm["saccCount"][i])
 
-		for fix in range(1,fixTot +1):
-			sFix = dm["fix%s_sTime" % fix][i]
-			saccLat = sFix - stimOnset
-			dm["saccLat%s" % fix][i] = saccLat
-			#print dm["saccLat%s" % fix][i]
-	#print dm["saccLat1"]
+		for sacc in range(1,saccTot +1):
+			
+			sSacc= dm["sacc%s_sTime" % sacc][i]
+			saccLat = sSacc - stimOnset
+			dm["saccLat%s" % sacc][i] = saccLat
 	
 	return dm		
 

@@ -10,8 +10,8 @@ The additional experiment for the revision
 ### parse.py()
 
 - From EyeLink events to dm containing raw fixation coordinates and time stamps.
-- If fix_y is too close to the center (to the fix dot), the fixation is skipped (not used for the analysis).
-- I don't look at saccade events.
+- We use saccade events instead of fixation events. This is because it often occurred that a fixation started but not ended (before the stop-recording item), which is why we loose a lot of trials.
+- If sacc_ey (y coordinate LP) is too close to the center (to the fix dot), the fixation is skipped (not used for the analysis).
 
 ### bbox.py()
 

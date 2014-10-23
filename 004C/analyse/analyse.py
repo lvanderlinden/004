@@ -1,3 +1,8 @@
+"""
+DESCRIPTION:
+Analyses for 004C
+"""
+
 import getDm
 import parse
 from exparser.Cache import cachedDataMatrix, cachedArray
@@ -5,10 +10,8 @@ from exparser.PivotMatrix import PivotMatrix
 from matplotlib import pyplot as plt
 from exparser.TangoPalette import *
 import numpy as np
-
-dm = parse.parseAsc(cacheId = "parsed")
-dm = getDm.addCoord(dm,cacheId = "with_coord")
-dm = getDm.addLat(dm, cacheId = "with_lat")
+import sys
+import selectDm
 
 def yNormDist(y):
 	
@@ -57,22 +60,8 @@ def plotDist(dm, dv, col=None, label=None, bins = 10):
 		markerfacecolor = col, markeredgewidth = 1, label = label)
 
 
-def select(dm):
-	
-	"""
-	Apply some selection criteria.
-	
-	Returns filtered dm
-	"""
 
-	dm = dm.select("saccLat1 != ''")
-	dm = dm.select("saccLat1 > 0")
-	dm = dm.select("xNorm1 != ''")
-	dm = dm.select("xNorm1 != -1000")
-	
-	return dm
-
-def gap(dm, norm=True, dv = "saccLat1"):
+def gap(dm, norm=True, dv = "saccLat1", bins = 10):
 	
 	"""
 	Plots sacc lat distributions as a function of gap condition.
@@ -84,6 +73,7 @@ def gap(dm, norm=True, dv = "saccLat1"):
 	norm	--- Boolean indicating whether or not to remove BS variance.
 	"""
 
+	fig = plt.figure()
 	lCols = [orange[1], blue[1]]
 	
 	if not norm:
@@ -97,7 +87,7 @@ def gap(dm, norm=True, dv = "saccLat1"):
 	for gap in dm.unique("gap"):
 		_dm = dm.select("gap == '%s'" % gap)
 		col = lCols.pop()
-		plotDist(_dm, dv, col=col, label = gap)
+		plotDist(_dm, dv, col=col, label = gap, bins = bins)
 	plt.legend(loc = 'best', frameon =False)
 	plt.savefig("gap.png")
 
@@ -108,28 +98,28 @@ def lpDist(dm, binVar = "saccLat1", norm = False):
 	Plots landing positions of first and second fixation as a function of
 	stimulus type.
 	"""
-	
+	fig = plt.figure()
 	plotCount = 0
-	for fix in (1, 2):
-		fixDm = dm.select("xNorm%s != ''" % fix)
-		fixDm = fixDm.select("xNorm%s != -1000" % fix)
+	for sacc in (1, 2):
+		saccDm = dm.select("xNorm%s != ''" % sacc)
+		saccDm = saccDm.select("xNorm%s != -1000" % sacc)
 		
-		dv = "xNorm%s" % fix
+		dv = "xNorm%s" % sacc
 		
 		if not norm:
 			dv = dv
 	
 		elif norm:
-			fixDm = fixDm.addField("ws_%s" % dv)
-			fixDm = fixDm.withinize(dv, "ws_%s" % dv, "file")
+			saccDm = saccDm.addField("ws_%s" % dv)
+			saccDm = saccDm.withinize(dv, "ws_%s" % dv, "file")
 			dv = "ws_%s" % dv
 
 		for stimType in dm.unique("stim_type"):
-			stimDm = fixDm.select("stim_type == '%s'" % stimType)
+			stimDm = saccDm.select("stim_type == '%s'" % stimType)
 			
 			plotCount +=1
 			plt.subplot(2,2,plotCount)
-			plt.title("stim = %s fix = %s" % (fix, stimType))
+			plt.title("stim = %s sacc = %s" % (stimType, sacc))
 
 			# Make 3 bins:
 			stimDm = stimDm.addField("bin_%s" % binVar)
@@ -160,6 +150,8 @@ def timecourse(dm, dv1, dv2, norm = False,  bins = 10):
 	bins	--- number of bins.
 	"""
 	
+	fig = plt.figure()
+	
 	if not norm:
 		dv2 = dv2
 	
@@ -189,9 +181,14 @@ def timecourse(dm, dv1, dv2, norm = False,  bins = 10):
 	
 
 if __name__ == "__main__":
-	
-	dm = select(dm)
-	#gap(dm)
-	#lpDist(dm)
+
+	dm = parse.parseAsc(cacheId = "parsed")
+	dm = getDm.addCoord(dm,cacheId = "with_coord")
+	dm = getDm.addLat(dm, cacheId = "with_lat")
+	dm.save("Sylvie.csv")
+	dm = selectDm.selectDm(dm, cacheId = "selection")
+	gap(dm)
+	#dm = dm.select("direction == 0")
+	lpDist(dm)
 	timecourse(dm, "saccLat1", "xNorm1")
 	
