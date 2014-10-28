@@ -92,12 +92,13 @@ def gap(dm, norm=True, dv = "saccLat1", bins = 10):
 	plt.savefig("gap.png")
 
 
-def lpDist(dm, binVar = "saccLat1", norm = False):
+def lpDist(dm,  norm = True):
 
 	"""
 	Plots landing positions of first and second fixation as a function of
-	stimulus type.
+	stimulus type
 	"""
+	
 	fig = plt.figure()
 	plotCount = 0
 	for sacc in (1, 2):
@@ -105,6 +106,7 @@ def lpDist(dm, binVar = "saccLat1", norm = False):
 		saccDm = saccDm.select("xNorm%s != -1000" % sacc)
 		
 		dv = "xNorm%s" % sacc
+		binVar = "saccLat%s" % sacc
 		
 		if not norm:
 			dv = dv
@@ -131,7 +133,9 @@ def lpDist(dm, binVar = "saccLat1", norm = False):
 				binDm = stimDm.select("bin_%s == %s" % (binVar, _bin))
 				plotDist(binDm, dv, col=col, bins = 10, label = _bin)
 			plt.axvline(0, color = gray[3], linestyle = "--")
-		plt.legend(frameon=False, loc = 'best')
+			plt.ylabel(dv)
+		
+		plt.legend(frameon=False, loc = 'best', title = binVar)
 		plt.savefig("lp.png")
 
 def timecourse(dm, dv1, dv2, norm = False,  bins = 10):
@@ -185,10 +189,9 @@ if __name__ == "__main__":
 	dm = parse.parseAsc(cacheId = "parsed")
 	dm = getDm.addCoord(dm,cacheId = "with_coord")
 	dm = getDm.addLat(dm, cacheId = "with_lat")
-	dm.save("Sylvie.csv")
 	dm = selectDm.selectDm(dm, cacheId = "selection")
-	gap(dm)
-	#dm = dm.select("direction == 0")
+	
+	#gap(dm)
 	lpDist(dm)
-	timecourse(dm, "saccLat1", "xNorm1")
+	#timecourse(dm, "saccLat1", "xNorm1")
 	

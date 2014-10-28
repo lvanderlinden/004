@@ -9,8 +9,11 @@ From samples to dm with one trial per row.
 Note that we use saccade events instead of fixation events. This is because
 it often occurred that a fixation started but not ended (before the 
 stop-recording item), which is why we loose a lot of trials.
+
+TODO: to make th LP dependent on ECC, we need to know ECC while parsing.
 """
 
+import pylab
 import sys
 import os
 import numpy as np
@@ -19,6 +22,7 @@ from exparser.EyelinkAscFolderReader import EyelinkAscFolderReader
 from exparser.CsvReader import CsvReader
 from exparser.Cache import cachedDataMatrix, cachedArray
 import constants
+from matplotlib import pyplot as plt
 
 class MyReader(EyelinkAscFolderReader):
 	
@@ -59,6 +63,7 @@ class MyReader(EyelinkAscFolderReader):
 				"sTime", "size", "sx", "sy"]:
 				trialDict["sacc%s_%s" % (i, prop)] = -1000
 		
+		
 	def parseLine(self, trialDict, l):
 		
 		"""
@@ -68,6 +73,7 @@ class MyReader(EyelinkAscFolderReader):
 		trialDict 	-- the dictionary of trial variables
 		l 			-- a list
 		"""
+
 
 		# MSG	6352138 display stimulus
 		if len(l) == 4 and l[2] == 'display' and l[3] == "stimulus":
@@ -129,6 +135,9 @@ class MyReader(EyelinkAscFolderReader):
 		print trialDict["file"], trialDict["count_trial_sequence"], \
 			trialDict['saccCount'], trialDict['trialId']
 		
+		if debug:
+			debugPlot(trialDict)
+		
 @cachedDataMatrix
 def parseAsc(driftCorr = False):
 
@@ -145,6 +154,10 @@ def parseAsc(driftCorr = False):
 		.dataMatrix()
 		
 	return dm
+
+if __name__ == "__main__":
+	
+	parseAsc()
 
 	
 	

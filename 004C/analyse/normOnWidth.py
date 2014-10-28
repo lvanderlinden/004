@@ -8,7 +8,7 @@ the PNG file, instead of the w and h of the PNG file itself.
 
 from matplotlib import pyplot as plt
 
-def normOnWidth(x,y,w,h):
+def normOnWidth(x,y,w,h,yStim):
 	
 	"""
 	Normalizes landing positions on object width.
@@ -18,10 +18,13 @@ def normOnWidth(x,y,w,h):
 	y		--- y coordinate
 	w		--- width of the bbox
 	h 		--- height of the bbox
+	yStim	--- yStim 
 	"""
 	
+	# Normalize yStim on display center:
+	yStim = -abs(yStim)
 	xNorm = float(x)/float(w)
-	yNorm = float(y)/float(h)
+	yNorm = (yStim-float(y))/float(h)
 	
 	return xNorm, yNorm
 

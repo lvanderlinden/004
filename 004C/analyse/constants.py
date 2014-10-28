@@ -17,7 +17,7 @@ srcStim = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object exper
 # center of the display
 
 # TODO: Change for new ecc:
-minYDistFromFix = 1 * ratio
+minYDistFromFix = 2 * ratio
 #minYDistFromFix = 0
 
 thLower = yCen - minYDistFromFix

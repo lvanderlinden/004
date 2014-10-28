@@ -19,13 +19,22 @@ def flip(x,y, flipCond, plot = True):
 	Returns flipped (xFlip,yFlip) tuple
 	"""
 	
+	#print "BEFORE FLIPPING:"
+	#print "Cond = ", flipCond
+	#print "		x = ", x
+	#print "		y = ", y
+	
 	if flipCond == "right":
 		xFlip = x
 		yFlip = y
 	if flipCond == "left":
 		xFlip = x*-1
 		yFlip = y
-		
+	
+	#print "AFTER FLIPPING:"
+	#print "		x = ", xFlip
+	#print "		y = ", yFlip
+	
 	if plot:
 		fig = plt.figure()
 		plt.title("flip = %s" % flipCond)

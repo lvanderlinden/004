@@ -23,8 +23,10 @@ from exparser.EyelinkAscFolderReader import EyelinkAscFolderReader
 from exparser.CsvReader import CsvReader
 from exparser.Cache import cachedDataMatrix, cachedArray
 
+debug = False
 
-# TODO: addVars
+dstPlot = "debug plots"
+
 
 @cachedDataMatrix
 def addCoord(dm, plot = False):
@@ -39,23 +41,25 @@ def addCoord(dm, plot = False):
 	plot	--- Boolean indicating whether or not to show some debug plots
 	"""
 	
-	
 	# Add col headers:
 	for sacc in range(1, int(max(dm["saccCount"])) + 1):
 		dm = dm.addField("xRot%s" % sacc, default = -1000)
 		dm = dm.addField("yRot%s" % sacc, default = -1000)
+		dm = dm.addField("xFlipped%s" % sacc, default = -1000)
+		dm = dm.addField("yFlipped%s" % sacc, default = -1000)
+		
 		dm = dm.addField("xNorm%s" % sacc, default = -1000)
 		dm = dm.addField("yNorm%s" % sacc, default = -1000)
+		dm = dm.addField("xNormOnCenter%s" % sacc, default = -1000)
+		dm = dm.addField("yNormOnCenter%s" % sacc, default = -1000)
 
 	dm = dm.addField("wBoxScaled")
 	dm = dm.addField("hBoxScaled")
 	dm = dm.addField("xCogScaled")
 	dm = dm.addField("xCogScaledDegr")
 	dm = dm.addField("stimFile", dtype = str)
-	dm = dm.addField("xNormOnCenter")
-	dm = dm.addField("yNormOnCenter")
 
-
+	
 	count = 0
 	# Walk through trials:
 	for i in dm.range():
@@ -90,12 +94,15 @@ def addCoord(dm, plot = False):
 		
 		# Walk through fixations within trial:
 		saccTot = int(dm["saccCount"][i])
+		
 
 		for sacc in range(1,saccTot +1):
 			
 			# Get raw coordinates:
 			x = dm["sacc%s_ex" % sacc][i]
 			y = dm["sacc%s_ey" % sacc][i]
+			
+			
 			
 			# Normalize such that origin = (0,0):
 			xNormOnCenter, yNormOnCenter = centralOrigin.centralOrigin(x, y,plot=plot)
@@ -111,13 +118,18 @@ def addCoord(dm, plot = False):
 			
 			# Normalize on object width:
 			xNormOnWidth, yNormOnWidth = normOnWidth.normOnWidth(xNormOnFlip, 
-				yNormOnFlip, wBoxScaled, hBoxScaled)
+				yNormOnFlip, wBoxScaled, hBoxScaled, yStim)
 
 			# Save new variables:
 			dm["xRot%s" % sacc][i] = xRot
 			dm["yRot%s" % sacc][i] = yRot
 			dm["xNorm%s" % sacc][i] = xNormOnWidth
 			dm["yNorm%s" % sacc][i] = yNormOnWidth
+			dm["xNormOnCenter%s" % sacc][i] = xNormOnCenter
+			dm["yNormOnCenter%s" % sacc][i] = yNormOnCenter
+			dm["xFlipped%s" % sacc][i] = xNormOnFlip
+			dm["yFlipped%s" % sacc][i] = yNormOnFlip
+			
 	return dm
 
 @cachedDataMatrix
