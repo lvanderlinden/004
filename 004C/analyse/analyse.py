@@ -92,20 +92,26 @@ def gap(dm, norm=True, dv = "saccLat1", bins = 10):
 	plt.savefig("gap.png")
 
 
-def lpDist(dm, norm = True):
+def lpDist(dm, dvId, norm = True):
 
 	"""
 	Plots landing positions of first and second fixation as a function of
 	stimulus type
+	
+	Arguments:
+	dm
+	dv		--- {xNorm, xNormAbsCenter}, of which the latter only holds for
+				exp 1.
 	"""
 	
 	plotCount = 0
 	for sacc in (1, 2):
 		
-		saccDm = dm.select("xNorm%s != ''" % sacc)
-		saccDm = saccDm.select("xNorm%s != -1000" % sacc)
+		dv = "%s%s" % (dvId,sacc)
 		
-		dv = "xNorm%s" % sacc
+		saccDm = dm.select("%s != ''" % dv)
+		saccDm = saccDm.select("%s != -1000" % dv)
+		
 		binVar = "saccLat%s" % sacc
 		
 		if not norm:
@@ -188,14 +194,13 @@ if __name__ == "__main__":
 
 	for exp in ["004A", "004B", "004C"]:
 		
-		if exp != "004C":
-			continue
-		
 		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
 		
-		fig = plt.figure()
-		lpDist(dm)
-		plt.savefig("LP_%s.png" % exp)
+		for dvId in ["xNorm", "xNormAbsCenter"]:
+			
+			fig = plt.figure()
+			lpDist(dm, dvId)
+			plt.savefig("%s_%s.png" % (dvId,exp))
 		
 		fig = plt.figure()
 		nPlot = 0
