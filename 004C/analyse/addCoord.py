@@ -36,8 +36,23 @@ def addCoord(dm, plot = False):
 	plot	--- Boolean indicating whether or not to show some debug plots
 	"""
 	
+	
+	exp = dm["expId"][0]
+
+	# HACK:
+	# Only symmetrical objects:
+	if exp != "004C":
+		dm = dm.select("symm == 'asymm'")
+
 	# Add col headers:
-	for sacc in range(1, int(max(dm["saccCount"])) + 1):
+
+	# HACK: Only first 5 saccades (otherwise it becomes too slow, and the trials
+	# with a lot of fixations are probably non-representative, e.g. just after
+	# a break, anyway)
+
+	#for sacc in range(1, int(max(dm["saccCount"])) + 1):
+	for sacc in range(1, 6):
+		
 		dm = dm.addField("xRot%s" % sacc, default = -1000)
 		dm = dm.addField("yRot%s" % sacc, default = -1000)
 		dm = dm.addField("xFlipped%s" % sacc, default = -1000)
@@ -50,7 +65,9 @@ def addCoord(dm, plot = False):
 
 	dm = dm.addField("wBoxScaled")
 	dm = dm.addField("hBoxScaled")
-	dm = dm.addField("xCogScaled")
+	
+	if exp == "004C":
+		dm = dm.addField("xCogScaled")
 	dm = dm.addField("xCogScaledDegr")
 	dm = dm.addField("stimFile", dtype = str)
 
@@ -61,43 +78,48 @@ def addCoord(dm, plot = False):
 		
 		# Get file info:
 		aRot = dm["realAngle"][i]
-		ecc = dm["ecc"][i]
 		xStim = dm["xStim"][i]
 		yStim = dm["yStim"][i]
-		xCog = dm["xCog"][i]
+		#xCog = dm["xCog"][i]
 		vf = dm["visual_field"][i]
 		flipCond = dm["flip"][i]
 		
 		# Log new info:
 		# PNG name:
+		# TODO: is this okay for 004A and 004B too??
 		stimFile = "%s_%s.png" % (dm["stim_type"][i], dm["stim_name"][i])
 		dm["stimFile"][i] = stimFile
 		
 		# Scaled cog:
-		xCogScaled = xCog/3
-		dm["xCogScaled"][i] = xCogScaled
+		if exp == "004C":
+			xCog = dm["xCog"][i]
+			xCogScaled = xCog/3
+			dm["xCogScaled"][i] = xCogScaled
 		
 		# Scaled cog in degrees:
-		xCogScaledDegr = xCogScaled/constants.ratio
+		xCogScaledDegr = dm["xCogScaled"][i]/constants.ratio
 		dm["xCogScaledDegr"][i] = xCogScaledDegr
-		
 		
 		# Size bounding box
 		wBoxScaled, hBoxScaled = bbox.bbox(stimFile)
+		
 		dm["wBoxScaled"][i] = wBoxScaled
 		dm["hBoxScaled"][i] = hBoxScaled
 		
 		# Walk through fixations within trial:
 		saccTot = int(dm["saccCount"][i])
-		
-
 		for sacc in range(1,saccTot +1):
+			
+			print sacc
+			
+			# HACK: Are there really trials containing more than 10 saccades?
+			# If so, do we want these saccades anyway?
+			if sacc > 5:
+				continue
 			
 			# Get raw coordinates:
 			x = dm["sacc%s_ex" % sacc][i]
 			y = dm["sacc%s_ey" % sacc][i]
-			
-			
 			
 			# Normalize such that origin = (0,0):
 			xNormOnCenter, yNormOnCenter = centralOrigin.centralOrigin(x, y,plot=plot)
@@ -107,7 +129,6 @@ def addCoord(dm, plot = False):
 				aRot,plot=plot)
 			
 			# Normalize on orientation, as if handle was always to the right.
-			# TODO: check!!!
 			xNormOnFlip, yNormOnFlip = flip.flip(xRot, \
 				yRot,flipCond, vf, plot=plot)
 			

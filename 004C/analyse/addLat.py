@@ -22,9 +22,10 @@ def addLat(dm):
 	count = 0
 	
 	# Add col headers:
-	for sacc in range(1, int(max(dm["saccCount"])) + 1):
+	#for sacc in range(1, int(max(dm["saccCount"])) + 1):
+	# HACK: only the first 5 saccades:
+	for sacc in range(1, 6):
 		dm = dm.addField("saccLat%s" % sacc)
-	
 	
 	# Walk through trials:
 	for i in dm.range():
@@ -32,6 +33,10 @@ def addLat(dm):
 		saccTot = int(dm["saccCount"][i])
 
 		for sacc in range(1,saccTot +1):
+			
+			# HACK:
+			if sacc > 5:
+				continue
 			
 			sSacc= dm["sacc%s_sTime" % sacc][i]
 			saccLat = sSacc - stimOnset

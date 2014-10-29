@@ -26,7 +26,7 @@ from matplotlib import pyplot as plt
 
 class MyReader(EyelinkAscFolderReader):
 	
-	def __init__(self, rtDm=None, **kwargs):
+	def __init__(self,  exp, **kwargs):
 		
 		"""
 		Constructor.
@@ -35,7 +35,7 @@ class MyReader(EyelinkAscFolderReader):
 		rtDm		--	A DataMatrix with RTs. (default=None)
 		"""
 		
-		#self.rtDm = rtDm
+		self.exp = exp
 		super(MyReader, self).__init__(**kwargs)
 	
 	# Perform some initalization before we start parsing a trial
@@ -53,6 +53,11 @@ class MyReader(EyelinkAscFolderReader):
 		self.waitForSacc= False
 		
 		self.saccCount = 0
+		
+		# In previous 2 experiments: manually adapt count_trial_sequence because
+		# it was not logged:
+		if self.exp != "004C":
+			self.count_trial_sequence = 0
 
 		# Make column headers where, in princicpe, the data from 10 saccades
 		# can be saved.
@@ -132,30 +137,44 @@ class MyReader(EyelinkAscFolderReader):
 
 		# Write some variables to dict
 		trialDict["saccCount"] = self.saccCount
+		
+		# Add some extra variables for first 2 experiments:
+		if self.exp != "004C":
+			trialDict["count_trial_sequence"] = self.count_trial_sequence
+			self.count_trial_sequence +=1
+			
+		trialDict["expId"] = self.exp
+		
 		print trialDict["file"], trialDict["count_trial_sequence"], \
 			trialDict['saccCount'], trialDict['trialId']
 		
 		
 @cachedDataMatrix
-def parseAsc(driftCorr = False):
+def parseAsc(exp, driftCorr = False):
 
 	"""
 	Parses ASC files.
 	
-	Keyword arguments:parseAsc
+	Arguments:
+	exp 			--- {"004A", "004B", "004C"}, experiment Id
+	
+	Keyword arguments:
 	driftCorr		--- Boolean indicating whether or not to apply offline 
 						driftcorrection. Set to False, because ONLINE
 						drift correction was activated in OpenSesame
 	"""
-	dm = MyReader(maxN=None, acceptNonMatchingColumns = True, \
-		path = "data/asc") \
-		.dataMatrix()
-		
+	
+	path = "/home/lotje/Documents/PhD Marseille/Studies/004/%s/data/ASC" % exp
+	
+	dm = MyReader(exp, maxN=None, acceptNonMatchingColumns = True, \
+		path = path).dataMatrix()
+	
 	return dm
 
 if __name__ == "__main__":
 	
-	parseAsc()
+	for exp in ["004B", "004C"]:
+		dm = parseAsc(exp = exp, cacheId = "%s_parsed" % exp)
 
 	
 	

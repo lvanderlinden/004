@@ -11,7 +11,7 @@ h = 768
 xCen = w/2
 yCen = h/2
 
-srcStim = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/opensesame script"
+srcStim = "/home/lotje/Documents/PhD Marseille/Studies/004/004C/opensesame script"
 
 # The y position of the eyes should be at least 2 degrees (?) from the 
 # center of the display

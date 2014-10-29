@@ -1,0 +1,155 @@
+CHANGELOG Françoise:
+
+1. 
+Reparsed raw data to determine not only the first saccade, but all saccades in the stimulus-response interval.
+- For the first, on-object saccade I used the EyeLink criteria + an extra criterion: sacc > 2.6 degrees.
+- For all subsequent within-object refixations I used the EyeLink criteria. 
+- I excluded off-object fixations offline (0.25% for the first landing position, 0.83% for the second, 1.78 for the 
+	third, and 2.78 for the fourth. TODO for Exp2)
+The first three landing positions are quite easy to analyse. The fourth are more difficult, because
+there are only 70 fourth saccades. For the second experiment (without fix checks) no more than 3 saccades
+occurred.
+
+The variables 'ToHandle' and 'ToContrast' are created during parsing. 
+
+2. 
+The CoG of all stimuli is calculated as follows:
+- First, the original bitmap is filtered with a Sobel filter, which detects edges. We did this because
+	edges are salient. TODO: does this mean color/saliency has no effect anymore?
+- Next, we caclulated the CoG of those filtered stimuli by TODO.
+If there are questions about this procedure: I admit that the choice is quite arbitrary, but the data from
+Experiment 2 suggest that it worked pretty well. However, to systematically investigate which kind of CoG
+calculation works best, an experiment with non-semantic stimuli could be run. Different CoG could be compared
+to see which one explains most of the variance. 
+
+TODO: make slide on calculation of CoG
+TODO: show Figures presentation
+TODO: show Figure containing all xCoG's per object
+
+3. New variables are created, which contain the landing position corrected for CoG. More specifically, this
+means that I subtracted the deviation between the bitmap's center and the CoG from the original landing position.
+This is done for both horizontal and vertical coordinates, although we're most interested in horizontal landing
+positions.
+
+TODO: The results can be seen in the trial-by-trial plots.
+
+
+4.
+I normalised all original landing positions such that -.5 indicates the extreme left of the object and .5 indicates
+the extreme right (irrespective of the exact width). Same for the vertical axes, but this is less useful
+(since we're mainly interested in horizontal landing position) and more tricky (because of a huge 
+undershoot -> TODO: show plots).
+
+For the corrected EM data, 0 means that the eyes landed on the CoG. -.5 and and .5 do not mean the left and right side
+of the object anymore.
+
+TODO: show plots with dist hists.
+
+5. Affordance effect:
+RT can be determined in several ways:
+- interval between stimulus onset and response
+- interval between fix check succesfull and response
+- interval between on-object landing and response
+I chose the latter.
+Exp 1: p = .10
+Exp 2: n.s. (p = .48) TODO: Look closer into this
+
+Filter criteria:
+	- saccade too fast: < 80 ms TODO: ref? TODO: try without?
+	- fix check 1 too long: > 700 ms
+	- fix check 2 too long: > 450 ms TODO: where did I get those values from? Distributions?
+	- non-handled objects (ruler, etc.)
+	- error trials
+	- RTs deviating more than 2.5 SD's from pp's condition mean are discarded
+
+6. 
+Effect of object orientation on landing position:
+Filter criteria:
+	- saccade too fast: < 80 ms TODO: ref? TODO: try without?
+	- fix check 1 too long: > 700 ms
+	- fix check 2 too long: > 450 ms TODO: where did I get those values from? Distributions?
+	- only stimuli without contrast manipulation
+	- only on-object landings (see above)
+	- non-handled objects (ruler, etc.)
+	- landing positions deviating more than 2.5 SD's from pp's condition mean are discarded
+
+TODO: heavy side
+
+6A:
+Initial landing position as a function of object orientation:
+	Exp1 original landing positions: away from handle (which is on average the heavy side
+	Exp1 corrected landing positions: towards handle
+	
+	See landing position plots -> 
+	- we shouldn't interpret this as bias towards the handle, because... TODO
+	- tendency to move eyes as straight as possible
+	- or: CoG is not calculated correctly and results in an over correction compared to 
+		what is actually going on in the visual system.
+	
+	Exp2: no difference between both orientations. TODO: both don't differ from zero, i.e. the
+	CoG and the center of the display (and NOT the center of the bitmap).
+	
+6B:
+Refixations:
+	No difference between experiments anymore. All refixations are directed towards the non-handled
+	side.
+	Interpretations:
+		- Most informative (all objects are handled: to unique information (necessary for categorisation)
+			is therefore on the other side).
+		- The part performing the action (e.g. 'hammering', 'washing', etc., cf. Humphreys).
+		- We cannot disociate between these and possible other explanations. The main point is that it seems
+			that more high-level processing is guiding the eyes.
+
+7:
+What is the influence of initial landing position on object processing, as measured by refixation probability,
+fixation duration, and RT? (Cf. OVP studies in words, and Henderson (1993), and Pajak & Nuthmann (2013) and 
+Foulsham & Kingstone (2013), although the latter are studies on natural-scene viewing.
+
+Filter criteria:
+	- saccade too fast: < 80 ms TODO: ref? TODO: try without?
+	- fix check 1 too long: > 700 ms
+	- fix check 2 too long: > 450 ms TODO: where did I get those values from? Distributions?
+	- only stimuli without contrast manipulation
+	- only on-object landings (see above)
+	- non-handled objects (ruler, etc.)
+
+Binning:
+	Landing positions are first binned per participant.
+	
+According to Françoise it's not surprising that we don't find any OVP effects, because the spread of the
+landing positions is too large (the PVL effect is too strong; no saccades towards the extremes of the objects).
+	
+TODO: with other factor (e.g. handle side) taken into account?
+TODO: bin without direction (i.e. further or closer from center, irrespective of direction)
+TODO: How does Nuthmann do the binning?
+
+8:
+Is it time that causes landing positions to change from CoG to more informative part
+of the object? If so, very late first saccades should resemble the landing position of
+second saccades.
+
+
+This analysis is carried out by the module 'timecourse.py'.
+
+- Firstly, distributions of saccade latencies as a function of gap and contrast manipulation are plotted. Note that this is only
+	done for the first two saccades, because for the third saccade there were not enough observations to do a 2x2 plot.
+- Secondly, distributions of landing positions are plotted separately per orientation.
+- Thirdly, new variables are created indicating whether the eyes landed towards
+	the object's handle (>0) or away (<0).
+- Rank order latencies and plot the corresponding landing position -> looks awful, there's no point in doing this..?
+- Regression analysis between saccLat and landing position TODO: REAL saccLat rather than from stim-onset?
+- Bin saccade latencies and plot landing positions as a function of those bins
+	- Note: the to-be-binned variable (in this case sacc lat) is first withinized according to the method
+		described by Cousineau (2004), meaning that the between-subject variance is removed. 
+		By doing this we make sure that observations from a given pp are equally divided across bins.
+
+9. Throw ALL saccade latencies in, don't separate between first, second and thrid sacccade!
+
+FOR ALL PROCESSING STEPS, SEE : 
+	file:///home/lotje/Documents/PhD Marseille/Studies/004 - One-object experiment - Orienation effect/Analysis/plots/analyses discussed with francoise 22-07-2013/verbose_new_analysis_discussed_with_FV.txt
+	
+TODO: Same for all above steps!
+
+
+	
+

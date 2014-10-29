@@ -1,3 +1,0 @@
-setwd("/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/analysis 004")
-getwd()
-mydata <- read.csv("selected_dm_004B_WITH_drift_corr.csv")

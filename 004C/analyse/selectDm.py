@@ -13,8 +13,13 @@ def selectDm(dm):
 	Returns filtered dm
 	"""
 
+	exp = dm["expId"][0]
+	dm = dm.select("mask_side == 'control'")
 
-	dm = dm.select("practice == 'no'")
+	if exp == "004C":
+		dm = dm.select("practice == 'no'")
+	if exp != "004C":
+		dm = dm.select("cond != 'practice'")
 	dm = dm.select("saccLat1 != ''")
 	dm = dm.select("saccLat1 > 0")
 	dm = dm.select("xNorm1 != ''")

@@ -1,11 +1,12 @@
 # 004
 
-Landing positions as a function of handle side.
+Saccadic landing positions on isolated photographs of daily-life graspable objects as a function of handle side.
 In revision for JoV.
 
-## 004C
+## analysis
 
-The additional experiment for the revision
+The goal is to have analysis scripts that work for all 3 experiments. I started to make scripts for 004C. Now, I'm adapting them such that they work for 004B as well. Todo: adapt for 004A (with fixation checks etc.)
+
 
 ### parse.py()
 

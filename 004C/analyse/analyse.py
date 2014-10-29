@@ -10,10 +10,8 @@ from matplotlib import pyplot as plt
 from exparser.TangoPalette import *
 import numpy as np
 import sys
-import selectDm
-import addCoord
-import addLat
 import constants
+import getDm
 
 def yNormDist(y):
 	
@@ -76,7 +74,7 @@ def gap(dm, norm=True, dv = "saccLat1", bins = 10):
 	"""
 
 	fig = plt.figure()
-	lCols = [orange[1], blue[1]]
+	lCols = [blue[1], orange[1]]
 	
 	if not norm:
 		dv = dv
@@ -101,7 +99,6 @@ def lpDist(dm, norm = True):
 	stimulus type
 	"""
 	
-	fig = plt.figure()
 	plotCount = 0
 	for sacc in (1, 2):
 		
@@ -187,66 +184,30 @@ def timecourse(dm, dv1, dv2, norm = False,  bins = 10):
 	plt.axhline(0, color = gray[3], linestyle = "--")
 	plt.legend(loc='best')
 	
-	
-	
-
 if __name__ == "__main__":
 
-	dm = parse.parseAsc(cacheId = "parsed")
-	dm = addCoord.addCoord(dm,cacheId = "with_coord")
-	dm = addLat.addLat(dm, cacheId = "with_lat")
-	dm = selectDm.selectDm(dm, cacheId = "selection")
-	
-	#lpDist(dm)
-	#plt.savefig("LP.png")
-	
-	fig = plt.figure()
-	nPlot = 0
-	for sacc in [1,2]:
-		print nPlot
-		nPlot +=1
-		plt.subplot(2,1,nPlot)
-		plt.title("sacc = %s" % sacc)
-		dv1 = "saccLat%s" % sacc
-		dv2 = "xNorm%s" % sacc
-		timecourse(dm, dv1, dv2)
-		plt.axhline(0, color = gray[5], linestyle = "--")
-		plt.ylim(-.2, .2)
-		#plt.show()
-	plt.savefig("bin.png")
-
-	#dm = dm.select("direction == 0")
-	#dm = dm.select("stim_type == 'object'")
-	#plotCount = 0
-	#for vf in dm.unique("visual_field"):
-		#vfDm = dm.select("visual_field == '%s'" % vf)
-		#for flip in dm.unique("flip"):
-			
-			#lCols = [orange[1], blue[1]]
-			#plotCount +=1
-			#flipDm = vfDm.select("flip == '%s'" % flip)
-			#plt.subplot(2,2,plotCount)
-			#plt.title("%s %s" % (vf, flip))
-			
-			#for sacc in [1, 2]:
-				
-				##dv = "sacc%s_ex" % sacc
-				#dv = "xNorm%s" % sacc
-				
-				#saccDm = flipDm.select("%s != ''" % (dv))
-				#saccDm = saccDm.select("%s != -1000" % (dv))
-
-				#col = lCols.pop()
-				#plotDist(saccDm, dv, col=col)
-				##plt.xlim((420, 620))
-				#plt.xlim((-.7,.7))
-			##plt.axvline(constants.xCen, color = gray[5], linestyle = "--")
-			#plt.axvline(0, color = gray[5], linestyle = "--")
-	#plt.savefig("norm.png")
-	
-	#for a in dm.unique("realAngle"):
-		#aDm = dm.select("realAngle == %s" % a)
-		#lpDist(aDm)
-		#plt.savefig("angle_%s.png" % a)
-	
-	
+	for exp in ["004A", "004B", "004C"]:
+		
+		if exp != "004C":
+			continue
+		
+		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
+		
+		fig = plt.figure()
+		lpDist(dm)
+		plt.savefig("LP_%s.png" % exp)
+		
+		fig = plt.figure()
+		nPlot = 0
+		for sacc in [1,2]:
+			print nPlot
+			nPlot +=1
+			plt.subplot(2,1,nPlot)
+			plt.title("sacc = %s" % sacc)
+			dv1 = "saccLat%s" % sacc
+			dv2 = "xNorm%s" % sacc
+			timecourse(dm, dv1, dv2)
+			plt.axhline(0, color = gray[5], linestyle = "--")
+			plt.ylim(-.2, .2)
+			#plt.show()
+		plt.savefig("bin_%s.png" % exp)
