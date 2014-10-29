@@ -5,11 +5,14 @@ Flip landing positions as if handle was always oriented to the right
 
 from matplotlib import pyplot as plt
 
-def flip(x,y, flipCond, plot = True):
+def flip(x,y, flipCond, vf, plot = True):
 	
 	"""
 	Converts landing positions relative to flip, such that landing positions
 	should be interpreted as if handle was always on the right.
+	
+	NOTE: because of the rotation, LPs should be flipped another time if the
+	stimuli was presented in the LVF (alpha = 160, 180 or 200)
 	
 	Arguments:
 	x		--- to-be-flipped x coordinate
@@ -19,11 +22,6 @@ def flip(x,y, flipCond, plot = True):
 	Returns flipped (xFlip,yFlip) tuple
 	"""
 	
-	#print "BEFORE FLIPPING:"
-	#print "Cond = ", flipCond
-	#print "		x = ", x
-	#print "		y = ", y
-	
 	if flipCond == "right":
 		xFlip = x
 		yFlip = y
@@ -31,9 +29,8 @@ def flip(x,y, flipCond, plot = True):
 		xFlip = x*-1
 		yFlip = y
 	
-	#print "AFTER FLIPPING:"
-	#print "		x = ", xFlip
-	#print "		y = ", yFlip
+	if vf == "lower":
+		xFlip *= -1
 	
 	if plot:
 		fig = plt.figure()

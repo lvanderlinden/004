@@ -3,7 +3,6 @@ DESCRIPTION:
 Analyses for 004C
 """
 
-import getDm
 import parse
 from exparser.Cache import cachedDataMatrix, cachedArray
 from exparser.PivotMatrix import PivotMatrix
@@ -12,6 +11,9 @@ from exparser.TangoPalette import *
 import numpy as np
 import sys
 import selectDm
+import addCoord
+import addLat
+import constants
 
 def yNormDist(y):
 	
@@ -92,7 +94,7 @@ def gap(dm, norm=True, dv = "saccLat1", bins = 10):
 	plt.savefig("gap.png")
 
 
-def lpDist(dm,  norm = True):
+def lpDist(dm, norm = True):
 
 	"""
 	Plots landing positions of first and second fixation as a function of
@@ -102,6 +104,7 @@ def lpDist(dm,  norm = True):
 	fig = plt.figure()
 	plotCount = 0
 	for sacc in (1, 2):
+		
 		saccDm = dm.select("xNorm%s != ''" % sacc)
 		saccDm = saccDm.select("xNorm%s != -1000" % sacc)
 		
@@ -134,9 +137,9 @@ def lpDist(dm,  norm = True):
 				plotDist(binDm, dv, col=col, bins = 10, label = _bin)
 			plt.axvline(0, color = gray[3], linestyle = "--")
 			plt.ylabel(dv)
-		
+			plt.xlim(-.7, .7)
+			
 		plt.legend(frameon=False, loc = 'best', title = binVar)
-		plt.savefig("lp.png")
 
 def timecourse(dm, dv1, dv2, norm = False,  bins = 10):
 	
@@ -154,8 +157,7 @@ def timecourse(dm, dv1, dv2, norm = False,  bins = 10):
 	bins	--- number of bins.
 	"""
 	
-	fig = plt.figure()
-	
+
 	if not norm:
 		dv2 = dv2
 	
@@ -163,6 +165,10 @@ def timecourse(dm, dv1, dv2, norm = False,  bins = 10):
 		dm = dm.addField("ws_%s" % dv2)
 		dm = dm.withinize(dv2, "ws_%s" % dv2, "file")
 		dv2 = "ws_%s" % dv2
+
+	for dv in [dv1,dv2]:
+		dm = dm.select("%s != -1000" % dv)
+		dm = dm.select("%s != ''" % dv)
 
 	lCols = [orange[1], blue[1]]
 
@@ -179,19 +185,68 @@ def timecourse(dm, dv1, dv2, norm = False,  bins = 10):
 			markerfacecolor='white', markeredgecolor=col, \
 			markeredgewidth=1, label = stimType)
 	plt.axhline(0, color = gray[3], linestyle = "--")
-	plt.legend()
-	plt.savefig("bin.png")
+	plt.legend(loc='best')
+	
 	
 	
 
 if __name__ == "__main__":
 
 	dm = parse.parseAsc(cacheId = "parsed")
-	dm = getDm.addCoord(dm,cacheId = "with_coord")
-	dm = getDm.addLat(dm, cacheId = "with_lat")
+	dm = addCoord.addCoord(dm,cacheId = "with_coord")
+	dm = addLat.addLat(dm, cacheId = "with_lat")
 	dm = selectDm.selectDm(dm, cacheId = "selection")
 	
-	#gap(dm)
-	lpDist(dm)
-	#timecourse(dm, "saccLat1", "xNorm1")
+	#lpDist(dm)
+	#plt.savefig("LP.png")
+	
+	fig = plt.figure()
+	nPlot = 0
+	for sacc in [1,2]:
+		print nPlot
+		nPlot +=1
+		plt.subplot(2,1,nPlot)
+		plt.title("sacc = %s" % sacc)
+		dv1 = "saccLat%s" % sacc
+		dv2 = "xNorm%s" % sacc
+		timecourse(dm, dv1, dv2)
+		plt.axhline(0, color = gray[5], linestyle = "--")
+		plt.ylim(-.2, .2)
+		#plt.show()
+	plt.savefig("bin.png")
+
+	#dm = dm.select("direction == 0")
+	#dm = dm.select("stim_type == 'object'")
+	#plotCount = 0
+	#for vf in dm.unique("visual_field"):
+		#vfDm = dm.select("visual_field == '%s'" % vf)
+		#for flip in dm.unique("flip"):
+			
+			#lCols = [orange[1], blue[1]]
+			#plotCount +=1
+			#flipDm = vfDm.select("flip == '%s'" % flip)
+			#plt.subplot(2,2,plotCount)
+			#plt.title("%s %s" % (vf, flip))
+			
+			#for sacc in [1, 2]:
+				
+				##dv = "sacc%s_ex" % sacc
+				#dv = "xNorm%s" % sacc
+				
+				#saccDm = flipDm.select("%s != ''" % (dv))
+				#saccDm = saccDm.select("%s != -1000" % (dv))
+
+				#col = lCols.pop()
+				#plotDist(saccDm, dv, col=col)
+				##plt.xlim((420, 620))
+				#plt.xlim((-.7,.7))
+			##plt.axvline(constants.xCen, color = gray[5], linestyle = "--")
+			#plt.axvline(0, color = gray[5], linestyle = "--")
+	#plt.savefig("norm.png")
+	
+	#for a in dm.unique("realAngle"):
+		#aDm = dm.select("realAngle == %s" % a)
+		#lpDist(aDm)
+		#plt.savefig("angle_%s.png" % a)
+	
 	

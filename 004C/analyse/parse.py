@@ -135,8 +135,6 @@ class MyReader(EyelinkAscFolderReader):
 		print trialDict["file"], trialDict["count_trial_sequence"], \
 			trialDict['saccCount'], trialDict['trialId']
 		
-		if debug:
-			debugPlot(trialDict)
 		
 @cachedDataMatrix
 def parseAsc(driftCorr = False):

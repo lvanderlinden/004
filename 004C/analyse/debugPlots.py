@@ -21,7 +21,7 @@ import constants
 from exparser.TangoPalette import *
 import random
 
-dstPlots = "./debug plots/norm"
+dstPlots = "./debug plots"
 
 def debugPlot(trialDm):
 	
@@ -166,9 +166,12 @@ def debugPlot(trialDm):
 		lp = plt.Circle((x,y), .1, color = "blue", fill=False)
 		fig.gca().add_artist(lp)
 		
-		print x
-	#plt.legend(loc = 'best')
-	plt.show()
+	ppPath = os.path.join(dstPlots, trialDm["file"][0])
+	if not os.path.exists(ppPath):
+		os.makedirs(ppPath)
+		
+	figPath = os.path.join(ppPath, str(trialDm["trialId"][0]) + ".png")
+	plt.savefig(figPath)
 	
 	
 if __name__ == "__main__":
@@ -179,9 +182,10 @@ if __name__ == "__main__":
 	
 	
 	for i in dm.range():
+		# Save 1 in 40 trials:
+		if i % 40 != 39:
+			continue
+		
 		trialDm = dm[i]
-		#if trialDm["visual_field"][0] == "upper":
-		#	continue
-
 		
 		debugPlot(trialDm)
