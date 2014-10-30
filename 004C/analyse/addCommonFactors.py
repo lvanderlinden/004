@@ -93,20 +93,25 @@ def addCommonFactors(dm):
 	
 	if dm["expId"][0] != "004C":
 		dm = addAngle(dm)
-		dm = addCog(dm)
 		
 		# Rename some variables that had different names in 004A/004B vs 004C:
 		
+		dm = addCog(dm)
 		dm = dm.addField("xStim")
 		dm = dm.addField("yStim")
 		dm = dm.addField("flip", dtype = str)
 		dm = dm.addField("stim_name", dtype = str)
 		dm = dm.addField("stim_type", dtype = str, default = "object")
 		
-		dm["xStim"] = 0 - dm["xCogScaled"]
 		dm["yStim"] = dm["y_stim"]
 		dm["flip"] = dm["handle_side"]
 		dm["stim_name"] = dm["object"]
+
+	if dm["expId"][0] == "004B":
+		dm["xStim"] = 0 - dm["xCogScaled"]
+
+	if dm["expId"][0] == "004A":
+		dm["xStim"] = 0
 	
 	if dm["expId"][0] == "004C":
 		

@@ -104,6 +104,16 @@ def lpDist(dm, dvId, norm = True):
 				exp 1.
 	"""
 	
+	exp = dm["expId"][0]
+
+	if exp == "004C":
+		nCols = nRows = 2
+		
+	else:
+		nCols = 1
+		nRows = 2
+		
+	
 	plotCount = 0
 	for sacc in (1, 2):
 		
@@ -126,7 +136,7 @@ def lpDist(dm, dvId, norm = True):
 			stimDm = saccDm.select("stim_type == '%s'" % stimType)
 			
 			plotCount +=1
-			plt.subplot(2,2,plotCount)
+			plt.subplot(nRows,nCols,plotCount)
 			plt.title("stim = %s sacc = %s" % (stimType, sacc))
 
 			# Make 3 bins:
@@ -196,11 +206,15 @@ if __name__ == "__main__":
 		
 		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
 		
-		for dvId in ["xNorm", "xNormAbsCenter"]:
-			
-			fig = plt.figure()
-			lpDist(dm, dvId)
-			plt.savefig("%s_%s.png" % (dvId,exp))
+		if exp == "004C":
+			figSize = (8,8)
+		else:
+			figSize = (4,8)
+		
+		dvId = "xNorm"
+		fig = plt.figure(figsize = figSize)
+		lpDist(dm, dvId)
+		plt.savefig("%s_%s.png" % (dvId,exp))
 		
 		fig = plt.figure()
 		nPlot = 0

@@ -30,13 +30,17 @@ def debugPlot(trialDm):
 	
 	fig = plt.figure(figsize = (5,20))
 	
+	exp = trialDm["expId"][0]
+	
 	name = trialDm["stim_name"][0]
+	print name
 	stimType = trialDm["stim_type"][0]
 	vf = trialDm["visual_field"][0]
 	flip = trialDm["flip"][0]
 	angle = trialDm["realAngle"][0]
-	direction = trialDm["direction"][0]
-	xCog = trialDm["xCog"]/constants.scale
+	#TODO: check this change!!!
+	#xCog = trialDm["xCog"]/constants.scale
+	xCog = trialDm["xCogScaled"]
 	wStim = trialDm["wBoxScaled"][0]
 	hStim = trialDm["hBoxScaled"][0]
 
@@ -45,7 +49,7 @@ def debugPlot(trialDm):
 	
 	# Plot 1: Raw coordinates:
 	plt.subplot(5,1,1)
-	plt.title("%s\ndirection = %s\nreal a = %s" % (vf, direction, angle))
+	plt.title("%s\nreal a = %s" % (vf, angle))
 	plt.xlim(0, constants.w)
 	plt.ylim(0, constants.h)
 	
@@ -65,6 +69,10 @@ def debugPlot(trialDm):
 	saccCount = int(trialDm["saccCount"][0])
 	
 	for sacc in range(1, saccCount +1):
+		
+		# HACK:
+		if sacc > 5:
+			continue
 		
 		x = trialDm["sacc%s_ex" % sacc][0]
 		y = trialDm["sacc%s_ey" % sacc][0]
@@ -86,6 +94,9 @@ def debugPlot(trialDm):
 	saccCount = int(trialDm["saccCount"][0])
 	
 	for sacc in range(1, saccCount +1):
+		
+		if sacc > 5:
+			continue
 		
 		x = trialDm["xNormOnCenter%s" % sacc][0]
 		y = trialDm["yNormOnCenter%s" % sacc][0]
@@ -110,6 +121,9 @@ def debugPlot(trialDm):
 	saccCount = int(trialDm["saccCount"][0])
 	
 	for sacc in range(1, saccCount +1):
+		
+		if sacc > 5:
+			continue
 		
 		x = trialDm["xRot%s" % sacc][0]
 		y = trialDm["yRot%s" % sacc][0]
@@ -142,6 +156,9 @@ def debugPlot(trialDm):
 	
 	for sacc in range(1, saccCount +1):
 		
+		if sacc > 5:
+			continue
+		
 		x = trialDm["xFlipped%s" % sacc][0]
 		y = trialDm["yFlipped%s" % sacc][0]
 		
@@ -160,32 +177,36 @@ def debugPlot(trialDm):
 	
 	for sacc in range(1, saccCount +1):
 		
+		if sacc > 5:
+			continue
+		
 		x = trialDm["xNorm%s" % sacc][0]
 		y = trialDm["yNorm%s" % sacc][0]
 		
 		lp = plt.Circle((x,y), .1, color = "blue", fill=False)
 		fig.gca().add_artist(lp)
 		
-	ppPath = os.path.join(dstPlots, trialDm["file"][0])
-	if not os.path.exists(ppPath):
-		os.makedirs(ppPath)
+	expPath = os.path.join(dstPlots, exp)
+	if not os.path.exists(expPath):
+		os.makedirs(expPath)
 		
-	figPath = os.path.join(ppPath, str(trialDm["trialId"][0]) + ".png")
+	figPath = os.path.join(expPath, "%s_%s.png" % (trialDm["file"][0], str(trialDm["trialId"][0])))
 	plt.savefig(figPath)
-	
+	#plt.show()
+	#sys.exit()
+	plt.clf()
+	pylab.close()
 	
 if __name__ == "__main__":
 	
-	dm = parse.parseAsc(cacheId = "parsed")
-	dm = getDm.addCoord(dm,cacheId = "with_coord")
-	dm = getDm.addLat(dm, cacheId = "with_lat")
-	
-	
-	for i in dm.range():
-		# Save 1 in 40 trials:
-		if i % 40 != 39:
-			continue
+	for exp in ["004A", "004B", "004C"]:
+
+		dm = getDm.getDm(exp, cacheId = "%s_final" % exp)
 		
-		trialDm = dm[i]
-		
-		debugPlot(trialDm)
+		for i in dm.range():
+			# Save 1 in 40 trials:
+			if i % 40 != 39:
+				continue
+			
+			trialDm = dm[i]
+			debugPlot(trialDm)

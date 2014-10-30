@@ -12,10 +12,12 @@ from exparser.Cache import cachedDataMatrix, cachedArray
 from exparser.CsvReader import CsvReader
 import parse
 import addCoord
-import addCoord2
 import addLat
 import selectDm
 import addCommonFactors
+import analyse
+from matplotlib import pyplot as plt
+from exparser.TangoPalette import *
 
 @cachedDataMatrix
 def getDm(exp):
@@ -26,11 +28,29 @@ def getDm(exp):
 	dm = parse.parseAsc(exp = exp, cacheId = "%s_parsed" % exp)
 	dm = addCommonFactors.addCommonFactors(dm, cacheId = "%s_common_factors" % exp)
 	dm = addCoord.addCoord(dm, cacheId = "%s_coord" % exp)
-	if exp == "004A":
-		dm = addCoord2.addCoord2(dm, cacheId = "%s_coord_rel_to_abs" % exp)
-	
 	dm = addLat.addLat(dm, cacheId = "%s_lat" % exp)
 	dm = selectDm.selectDm(dm, cacheId = "%s_select" % exp)
 	
 	return dm
+
+if __name__ == "__main__":
+
+	for exp in ["004A", "004B", "004C"]:
+		
+		if exp != "004C":
+			continue
+		
+		
+		dm = getDm(exp = exp, cacheId = "%s_final" % exp)
+		lCols = allColors
+		
+		fig = plt.figure()
+		for pp in dm.unique("file"):
+			ppDm = dm.select("file == '%s'" % pp)
+			col = lCols.pop()
+			analyse.plotDist(ppDm, "saccLat1", col=col, label = pp)
+		plt.legend()
+		plt.show()
+			
+
 

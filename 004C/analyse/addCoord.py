@@ -68,6 +68,7 @@ def addCoord(dm, plot = False):
 	
 	if exp == "004C":
 		dm = dm.addField("xCogScaled")
+	
 	dm = dm.addField("xCogScaledDegr")
 	dm = dm.addField("stimFile", dtype = str)
 
@@ -109,8 +110,6 @@ def addCoord(dm, plot = False):
 		# Walk through fixations within trial:
 		saccTot = int(dm["saccCount"][i])
 		for sacc in range(1,saccTot +1):
-			
-			print sacc
 			
 			# HACK: Are there really trials containing more than 10 saccades?
 			# If so, do we want these saccades anyway?
