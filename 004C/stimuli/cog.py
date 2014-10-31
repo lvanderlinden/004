@@ -16,8 +16,6 @@ yCen = height/2
 gravCol = "#f57900"
 cenCol = "#729fcf"
 
-
-
 def cog(_src, show=False, invert=True, edgeDetect=True, col = True):
 
 	"""

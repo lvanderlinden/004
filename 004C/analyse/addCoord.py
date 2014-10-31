@@ -62,6 +62,11 @@ def addCoord(dm, plot = False):
 		dm = dm.addField("yNorm%s" % sacc, default = -1000)
 		dm = dm.addField("xNormOnCenter%s" % sacc, default = -1000)
 		dm = dm.addField("yNormOnCenter%s" % sacc, default = -1000)
+		
+		# In the first experiment: add 'corrected' LPs:
+		if dm["expId"][0] == "004A":
+			dm = dm.addField("xNormCorr%s" % sacc, default = -1000)
+
 
 	dm = dm.addField("wBoxScaled")
 	dm = dm.addField("hBoxScaled")
@@ -70,8 +75,8 @@ def addCoord(dm, plot = False):
 		dm = dm.addField("xCogScaled")
 	
 	dm = dm.addField("xCogScaledDegr")
+	dm = dm.addField("xCogNorm")
 	dm = dm.addField("stimFile", dtype = str)
-
 	
 	count = 0
 	# Walk through trials:
@@ -97,15 +102,20 @@ def addCoord(dm, plot = False):
 			xCogScaled = xCog/3
 			dm["xCogScaled"][i] = xCogScaled
 		
-		# Scaled cog in degrees:
-		xCogScaledDegr = dm["xCogScaled"][i]/constants.ratio
-		dm["xCogScaledDegr"][i] = xCogScaledDegr
-		
 		# Size bounding box
 		wBoxScaled, hBoxScaled = bbox.bbox(stimFile)
 		
 		dm["wBoxScaled"][i] = wBoxScaled
 		dm["hBoxScaled"][i] = hBoxScaled
+
+
+		# Scaled cog in degrees:
+		xCogScaledDegr = dm["xCogScaled"][i]/constants.ratio
+		dm["xCogScaledDegr"][i] = xCogScaledDegr
+		
+		# Cog normalized on object width:
+		dm["xCogNorm"][i] = dm["xCogScaled"][i]/dm["wBoxScaled"][i]
+		
 		
 		# Walk through fixations within trial:
 		saccTot = int(dm["saccCount"][i])
@@ -144,5 +154,9 @@ def addCoord(dm, plot = False):
 			dm["yNormOnCenter%s" % sacc][i] = yNormOnCenter
 			dm["xFlipped%s" % sacc][i] = xNormOnFlip
 			dm["yFlipped%s" % sacc][i] = yNormOnFlip
+			
+			if dm["expId"][i] == "004A":
+				dm["xNormCorr%s" % sacc][i] = dm["xNorm%s" % sacc][i] - \
+					dm["xCogNorm"][i]
 			
 	return dm

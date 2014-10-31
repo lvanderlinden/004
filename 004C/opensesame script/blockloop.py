@@ -6,7 +6,7 @@ Create block_loop content
 from exparser.CsvReader import CsvReader
 
 
-srcDm = "/home/lotje/Documents/PhD Marseille/Studies/004 - Single-object experiment - Handle-orientation effect/004C/stimuli/cog_per_stim.csv"
+srcDm = "/home/lotje/Documents/PhD Marseille/Studies/004/004C/stimuli/cog_per_stim.csv"
 dm = CsvReader(srcDm).dataMatrix()
 
 stimList = ["chisel", "chisel2", "mallet", "paintbrush", "screwdriver", \

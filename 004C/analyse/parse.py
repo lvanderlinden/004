@@ -90,7 +90,6 @@ class MyReader(EyelinkAscFolderReader):
 			# The time stamp of the stimulus (necessary for calculating 
 			# latencies):
 			self.stimOnset = l[1]
-
 			self.waitForSacc = True
 		
 		if self.waitForSacc:
@@ -144,13 +143,14 @@ class MyReader(EyelinkAscFolderReader):
 			self.count_trial_sequence +=1
 			
 		trialDict["expId"] = self.exp
+		trialDict["offlineDriftCorr"] = self.offlineDriftCorr
 		
 		print trialDict["file"], trialDict["count_trial_sequence"], \
 			trialDict['saccCount'], trialDict['trialId']
 		
 		
 @cachedDataMatrix
-def parseAsc(exp, driftCorr = False):
+def parseAsc(exp, offlineDriftCorr = None):
 
 	"""
 	Parses ASC files.
@@ -164,10 +164,13 @@ def parseAsc(exp, driftCorr = False):
 						drift correction was activated in OpenSesame
 	"""
 	
+	if offlineDriftCorr == None:
+		raise Exception("Please specificy whether offline drift correction should be enabled")
+	
 	path = "/home/lotje/Documents/PhD Marseille/Studies/004/%s/data/ASC" % exp
 	
 	dm = MyReader(exp, maxN=None, acceptNonMatchingColumns = True, \
-		path = path).dataMatrix()
+		path = path, offlineDriftCorr= offlineDriftCorr).dataMatrix()
 	
 	return dm
 

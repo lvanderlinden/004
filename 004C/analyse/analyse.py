@@ -202,31 +202,37 @@ def timecourse(dm, dv1, dv2, norm = False,  bins = 10):
 	
 if __name__ == "__main__":
 
-	for exp in ["004A", "004B", "004C"]:
-		
-		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
-		
-		if exp == "004C":
-			figSize = (8,8)
-		else:
-			figSize = (4,8)
-		
-		dvId = "xNorm"
-		fig = plt.figure(figsize = figSize)
-		lpDist(dm, dvId)
-		plt.savefig("%s_%s.png" % (dvId,exp))
-		
-		fig = plt.figure()
-		nPlot = 0
-		for sacc in [1,2]:
-			print nPlot
-			nPlot +=1
-			plt.subplot(2,1,nPlot)
-			plt.title("sacc = %s" % sacc)
-			dv1 = "saccLat%s" % sacc
-			dv2 = "xNorm%s" % sacc
-			timecourse(dm, dv1, dv2)
-			plt.axhline(0, color = gray[5], linestyle = "--")
-			plt.ylim(-.2, .2)
-			#plt.show()
-		plt.savefig("bin_%s.png" % exp)
+
+	# Exp 1:
+	exp = "004A"
+	dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
+	dm = dm.select("sacc1_ex != ''")
+	dm = dm.select("sacc1_ex != -1000")
+	plt.hist(dm["sacc1_ex"], bins = 100)
+	
+	plt.show()
+	
+	figSize = (8,8)
+	
+
+
+	# Exp 3:
+	figSize = (8,8)
+	fig = plt.figure(figsize = figSize)
+	lpDist(dm, dvId)
+	plt.savefig("Dist_%s_%s.png" % (exp, dvId))
+	
+	fig = plt.figure()
+	nPlot = 0
+	for sacc in [1,2]:
+		print nPlot
+		nPlot +=1
+		plt.subplot(2,1,nPlot)
+		plt.title("sacc = %s" % sacc)
+		dv1 = "saccLat%s" % sacc
+		dv2 = "xNorm%s" % sacc
+		timecourse(dm, dv1, dv2)
+		plt.axhline(0, color = gray[5], linestyle = "--")
+		plt.ylim(-.2, .2)
+		#plt.show()
+	plt.savefig("Bins_%s_%s.png" % (exp, dvId))

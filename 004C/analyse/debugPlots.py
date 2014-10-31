@@ -140,13 +140,22 @@ def plotRot(trialDm, fig):
 	# because of the rotation.
 	wStim = trialDm["wBoxScaled"][0]
 	hStim = trialDm["hBoxScaled"][0]
-	bbox = plt.Rectangle((-trialDm["xCogScaled"][0] - wStim/2, \
+	
+	if trialDm["expId"][0] != "004A":
+		left = -trialDm["xCogScaled"][0] - wStim/2
+	else:
+		left = 0-wStim/2
+	
+	bbox = plt.Rectangle((left, \
 		(-abs(trialDm["yStim"][0]))-hStim/2), wStim, hStim, color = "yellow")
 	fig.gca().add_artist(bbox)
 
 	# Fix and stim.
 	fix = plt.Circle((0, 0), 4, color = "black")
-	stim = plt.Circle((-trialDm["xCogScaled"][0], -abs(trialDm["yStim"][0])), 10, color = "red")
+	if trialDm["expId"][0] != "004A":
+		stim = plt.Circle((-trialDm["xCogScaled"][0], -abs(trialDm["yStim"][0])), 10, color = "red")
+	else:
+		stim = plt.Circle((0, -abs(trialDm["yStim"][0])), 10, color = "red")
 	fig.gca().add_artist(stim)
 	fig.gca().add_artist(fix)
 
@@ -180,17 +189,25 @@ def plotFlip(trialDm, fig):
 	# Stim, fix and bbox:
 	fix = plt.Circle((0, 0), 4, color = "black")
 	
-	# Stim position has to be inverted if handle was left.
-	# TODO: in LVF?
-	if trialDm["flip"] == "left":
-		xStimFlipped = trialDm["xCogScaled"][0]
+	if trialDm["expId"][0] != "004A":
+		if trialDm["flip"] == "left":
+			xStimFlipped = trialDm["xCogScaled"][0]
+		else:
+			xStimFlipped = -trialDm["xCogScaled"][0]
 	else:
-		xStimFlipped = -trialDm["xCogScaled"][0]
+		xStimFlipped = 0
 	stim = plt.Circle((xStimFlipped, -abs(trialDm["yStim"][0])), 10, color = "red")
+
 	
 	wStim = trialDm["wBoxScaled"][0]
 	hStim = trialDm["hBoxScaled"][0]
-	bbox = plt.Rectangle((xStimFlipped - wStim/2, (-abs(trialDm["yStim"][0]))-hStim/2), wStim, hStim, color = "yellow")
+	
+	if trialDm["expId"][0] != "004A":
+		left = xStimFlipped - wStim/2
+	else:
+		left = 0 - wStim/2
+	
+	bbox = plt.Rectangle((left, (-abs(trialDm["yStim"][0]))-hStim/2), wStim, hStim, color = "yellow")
 	fig.gca().add_artist(bbox)
 	fig.gca().add_artist(stim)
 	fig.gca().add_artist(fix)
@@ -210,13 +227,8 @@ def plotFinal(trialDm, fig):
 	fig 		--- pyplot figure instance
 	"""
 	
-	# Vertical meridian:
-	plt.axvline(0, linestyle = "--", color = "gray", label = "cog")
 
 	# Absolute center:
-	# Stim position has to be inverted if handle was left.
-	# TODO: in LVF?
-	# TODO: this is not correct??
 	if trialDm["flip"][0] == "left":
 		xStimFlipped = trialDm["xCogScaled"][0]
 	elif trialDm["flip"][0] == "right":
@@ -224,11 +236,26 @@ def plotFinal(trialDm, fig):
 	else:
 		raise Exception("flip should have the value left or right")
 	
-	plt.axvline(xStimFlipped/trialDm["wBoxScaled"][0], linestyle = "--", color = "red", label = "abs")
+	# Cog and absolute center:
+	if trialDm["expId"][0] != "004A":
+		cog = 0
+		absCenter = xStimFlipped/trialDm["wBoxScaled"][0]
+	else:
+		cog = trialDm["xCogScaled"][0]/trialDm["wBoxScaled"][0]
+		absCenter = 0
+
+	plt.axvline(cog, linestyle = "--", color = "green", label = "cog")
+	plt.axvline(absCenter, linestyle = "--", color = "orange", label = "abs")
+
+	
 	plt.legend(frameon=False, loc = 'best')
 
 	# Bbox:
-	bbox = plt.Rectangle((-.5, -.5), 1, 1, color = "yellow")
+	if trialDm["expId"][0] != "004A":
+		left = xStimFlipped/trialDm["wBoxScaled"]-.5
+	else:
+		left = -.5
+	bbox = plt.Rectangle((left, -.5), 1, 1, color = "yellow")
 	fig.gca().add_artist(bbox)
 	plt.xlim(-2,2)
 	plt.ylim(-2,2)
@@ -282,26 +309,34 @@ def debugPlot(trialDm):
 	if not os.path.exists(expPath):
 		os.makedirs(expPath)
 		
-	figPath = os.path.join(expPath, "%s_%s.png" % (trialDm["file"][0], str(trialDm["trialId"][0])))
+	figPath = os.path.join(expPath, "%s_%s.png" % (trialDm["file"][0], \
+		str(trialDm["trialId"][0])))
 	plt.savefig(figPath)
-	plt.show()
+	#plt.show()
 	
 	plt.clf()
 	pylab.close()
-	
+	#raw_input()
 if __name__ == "__main__":
 	
 	for exp in ["004A", "004B", "004C"]:
 		
-		if exp != "004C":
+		if exp != "004B":
 			continue
 
 		dm = getDm.getDm(exp, cacheId = "%s_final" % exp)
 		
 		for i in dm.range():
-			# Save 1 in 40 trials:
-			if i % 40 != 39:
+			if dm["stim_name"][i] != "screwdriver":
 				continue
+			if dm["stim_type"][i] != "object":
+				continue
+			if dm["mask_side"][i] != "control":
+				continue
+
+			# Save 1 in 40 trials:
+			#if i % 100 != 99:
+			#	continue
 			
 			trialDm = dm[i]
 			debugPlot(trialDm)
