@@ -67,7 +67,7 @@ def addCog(dm):
 	# Get cog dictionary:
 	d = cogDict()
 
-	dm = dm.addField("xCogScaled")
+	dm = dm.addField("xCog")
 
 	for i in dm.range():
 		
@@ -75,8 +75,8 @@ def addCog(dm):
 		mask = dm["mask_side"][i]
 		flip = dm["handle_side"][i]
 		
-		xCogScaled = d[stimName, mask, flip]
-		dm["xCogScaled"][i] = xCogScaled
+		xCog = d[stimName, mask, flip]
+		dm["xCog"][i] = xCog
 		
 	return dm
 
@@ -108,7 +108,7 @@ def addCommonFactors(dm):
 		dm["stim_name"] = dm["object"]
 
 	if dm["expId"][0] == "004B":
-		dm["xStim"] = 0 - dm["xCogScaled"]
+		dm["xStim"] = 0 - dm["xCog"]
 
 	if dm["expId"][0] == "004A":
 		dm["xStim"] = 0

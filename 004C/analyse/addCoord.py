@@ -67,13 +67,11 @@ def addCoord(dm, plot = False):
 		if dm["expId"][0] == "004A":
 			dm = dm.addField("xNormCorr%s" % sacc, default = -1000)
 
-
 	dm = dm.addField("wBoxScaled")
 	dm = dm.addField("hBoxScaled")
 	
-	if exp == "004C":
-		dm = dm.addField("xCogScaled")
-	
+	#if exp == "004C":
+	dm = dm.addField("xCogScaled")
 	dm = dm.addField("xCogScaledDegr")
 	dm = dm.addField("xCogNorm")
 	dm = dm.addField("stimFile", dtype = str)
@@ -97,17 +95,16 @@ def addCoord(dm, plot = False):
 		dm["stimFile"][i] = stimFile
 		
 		# Scaled cog:
-		if exp == "004C":
-			xCog = dm["xCog"][i]
-			xCogScaled = xCog/3
-			dm["xCogScaled"][i] = xCogScaled
+		#if exp == "004C":
+		xCog = dm["xCog"][i]
+		xCogScaled = xCog/3
+		dm["xCogScaled"][i] = xCogScaled
 		
 		# Size bounding box
 		wBoxScaled, hBoxScaled = bbox.bbox(stimFile)
 		
 		dm["wBoxScaled"][i] = wBoxScaled
 		dm["hBoxScaled"][i] = hBoxScaled
-
 
 		# Scaled cog in degrees:
 		xCogScaledDegr = dm["xCogScaled"][i]/constants.ratio
@@ -155,8 +152,9 @@ def addCoord(dm, plot = False):
 			dm["xFlipped%s" % sacc][i] = xNormOnFlip
 			dm["yFlipped%s" % sacc][i] = yNormOnFlip
 			
+			# TODO: CHECK!!!
 			if dm["expId"][i] == "004A":
 				dm["xNormCorr%s" % sacc][i] = dm["xNorm%s" % sacc][i] - \
 					dm["xCogNorm"][i]
-			
+
 	return dm

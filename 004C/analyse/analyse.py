@@ -92,7 +92,8 @@ def gap(dm, norm=True, dv = "saccLat1", bins = 10):
 	plt.savefig("gap.png")
 
 
-def lpDist(dm, dvId, norm = True):
+def lpDist(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 3, \
+	nBinsLps = 15):
 
 	"""
 	Plots landing positions of first and second fixation as a function of
@@ -100,36 +101,26 @@ def lpDist(dm, dvId, norm = True):
 	
 	Arguments:
 	dm
-	dv		--- {xNorm, xNormAbsCenter}, of which the latter only holds for
+	dvId		--- {xNorm, xNormAbsCenter}, of which the latter only holds for
 				exp 1.
 	"""
 	
 	exp = dm["expId"][0]
 
-	if exp == "004C":
-		nCols = nRows = 2
-		
-	else:
-		nCols = 1
-		nRows = 2
+	nCols = 2
+	nRows = 2
 		
 	
 	plotCount = 0
 	for sacc in (1, 2):
 		
 		dv = "%s%s" % (dvId,sacc)
-		
-		saccDm = dm.select("%s != ''" % dv)
-		saccDm = saccDm.select("%s != -1000" % dv)
-		
 		binVar = "saccLat%s" % sacc
 		
-		if not norm:
-			dv = dv
-	
-		elif norm:
-			saccDm = saccDm.addField("ws_%s" % dv)
-			saccDm = saccDm.withinize(dv, "ws_%s" % dv, "file")
+		saccDm = getSaccDm(dm, dv, binVar, nBins = nBinsSaccLat, norm=norm, \
+			removeOutliers = removeOutliers)
+		
+		if norm:
 			dv = "ws_%s" % dv
 
 		for stimType in dm.unique("stim_type"):
@@ -140,99 +131,143 @@ def lpDist(dm, dvId, norm = True):
 			plt.title("stim = %s sacc = %s" % (stimType, sacc))
 
 			# Make 3 bins:
-			stimDm = stimDm.addField("bin_%s" % binVar)
-			stimDm = stimDm.calcPerc(binVar, "bin_%s" % binVar, keys="file", nBin=3)
-			
 			lCols = [blue[1], orange[1], green[1]]
 			for _bin in stimDm.unique("bin_%s" % binVar):
 				col = lCols.pop()
 				binDm = stimDm.select("bin_%s == %s" % (binVar, _bin))
-				plotDist(binDm, dv, col=col, bins = 10, label = _bin)
+				plotDist(binDm, dv, col=col, bins = nBinsLps, label = _bin)
 			plt.axvline(0, color = gray[3], linestyle = "--")
-			plt.ylabel(dv)
+			#plt.ylabel(dv)
 			plt.xlim(-.7, .7)
-			
-		plt.legend(frameon=False, loc = 'best', title = binVar)
+			plt.ylim(0,1.1)
+		plt.xlabel("Normalized LP (neg. = action-performing, pos. = handle)")
 
-def timecourse(dm, dv1, dv2, norm = False,  bins = 10):
+def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10):
 	
 	"""
 	Arguments:
-	dm		--- DataMatrix instance
-	var1	--- bin variable (x axis)
-	var2	--- dependent variable (y axis)
+	dm				--- DataMatrix instance
+	dvId		--- {xNorm, xNormAbsCenter}, of which the latter only holds for
+					exp 1.
 	
 	Keyword arguments:
-	norm	--- Boolean indicating whether or not to remove the bs-variance
-				from the variable on the y axis (for the variable on the x
-				axis, we already do this by giving the keyword argument 
-				'key' in calcPerc() the value "file".
-	bins	--- number of bins.
+	norm			--- Boolean indicating whether or not to remove the bs-variance
+						from the variable on the y axis (for the variable on the x
+						axis, we already do this by giving the keyword argument 
+						'key' in calcPerc() the value "file".
+	removeOutliers	--- Boolean indicating whether or not to trim on 2.5 SDs
+						from mean
+	nBins			--- number of bins.
 	"""
 	
-
-	if not norm:
-		dv2 = dv2
+	exp = dm["expId"][0]
 	
-	elif norm:
-		dm = dm.addField("ws_%s" % dv2)
-		dm = dm.withinize(dv2, "ws_%s" % dv2, "file")
-		dv2 = "ws_%s" % dv2
-
-	for dv in [dv1,dv2]:
-		dm = dm.select("%s != -1000" % dv)
-		dm = dm.select("%s != ''" % dv)
-
-	lCols = [orange[1], blue[1]]
-
-	for stimType in dm.unique("stim_type"):
-		col = lCols.pop()
-		stimDm = dm.select("stim_type == '%s'" % stimType)
-		stimDm = stimDm.addField("bin_%s" % dv1)
-		stimDm = stimDm.calcPerc(dv1, "bin_%s" % dv1, keys=["file"], nBin=10)
+	for sacc in (1,2):
 	
-		cmX = stimDm.collapse(['bin_%s' % dv1], dv1)
-		cmY = stimDm.collapse(['bin_%s' % dv1], dv2)
+		dv = "%s%s" % (dvId, sacc)
+		binVar = "saccLat%s" % sacc
+		saccDm = getSaccDm(dm, dv, binVar, nBins = nBins,\
+			norm=True, removeOutliers=True)
 		
-		plt.plot(cmX['mean'], cmY['mean'], marker = 'o', color=col, \
-			markerfacecolor='white', markeredgecolor=col, \
-			markeredgewidth=1, label = stimType)
-	plt.axhline(0, color = gray[3], linestyle = "--")
-	plt.legend(loc='best')
+		if norm:
+			dv = "ws_%s" % dv
+
+		lCols = [orange[1], blue[1]]
+
+		for stimType in dm.unique("stim_type"):
+			col = lCols.pop()
+			stimDm = saccDm.select("stim_type == '%s'" % stimType)
+		
+			cmX = stimDm.collapse(['bin_%s' % binVar], binVar)
+			cmY = stimDm.collapse(['bin_%s' % binVar], dv)
+			
+			plt.plot(cmX['mean'], cmY['mean'], marker = 'o', color=col, \
+				markerfacecolor='white', markeredgecolor=col, \
+				markeredgewidth=1, label = stimType)
+		plt.axhline(0, color = gray[3], linestyle = "--")
 	
+def getSaccDm(dm, dv, binVar, nBins, norm=True, removeOutliers=True):
+	
+	"""
+	Apply selection criteria to sacc dm.
+	
+	NOTE: I made this a separate function just to be sure that the time course
+	and distribution plots come from exactly the same data set.
+	
+	Arguments:
+	dm
+	dv
+	binVar
+	nBins
+	"""
+
+	saccDm = dm.select("%s != ''" % dv)
+	saccDm = saccDm.select("%s != -1000" % dv)
+
+	if removeOutliers:
+		# Remove outliers:
+		# LPs:
+		saccDm = saccDm.selectByStdDev(keys=["file"], dv = dv)
+		saccDm  = saccDm.removeField("__dummyCond__")
+		saccDm  = saccDm.removeField("__stdOutlier__")
+		# Latencies:
+		saccDm  = saccDm.selectByStdDev(keys=["file"], dv =binVar)
+			
+	if norm:
+		# Normalize LPs:
+		saccDm = saccDm.addField("ws_%s" % dv)
+		saccDm = saccDm.withinize(dv, "ws_%s" % dv, "file")
+		dv = "ws_%s" % dv
+
+	# Bin the bin var in the desired number of bins:
+	saccDm = saccDm.addField("bin_%s" % binVar)
+	
+	if norm:
+		saccDm = saccDm.calcPerc(binVar, "bin_%s" % binVar, keys=["file"], \
+			nBin=nBins)
+	else:
+		saccDm = saccDm.calcPerc(binVar, "bin_%s" % binVar, nBin=nBins)
+
+	return saccDm
+
 if __name__ == "__main__":
-
-
-	# Exp 1:
-	exp = "004A"
-	dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
-	dm = dm.select("sacc1_ex != ''")
-	dm = dm.select("sacc1_ex != -1000")
-	plt.hist(dm["sacc1_ex"], bins = 100)
 	
-	plt.show()
+	norm = True
+	removeOutliers = True
 	
-	figSize = (8,8)
-	
+	for exp in ["004A", "004C"]:
+		if exp == "004A":
+			continue
+			lDv = ["xNorm", "xNormCorr"]
+		if exp == "004C":
+			lDv = ["xNorm"]
 
+		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
 
-	# Exp 3:
-	figSize = (8,8)
-	fig = plt.figure(figsize = figSize)
-	lpDist(dm, dvId)
-	plt.savefig("Dist_%s_%s.png" % (exp, dvId))
+		for dvId in lDv:
+			
+			#if dvId == "xNormCorr":
+			#	continue
+			# DIST:
+			fig = plt.figure(figsize = (8,8))
+			plt.subplots_adjust(hspace = .3, wspace = .3)
+			lpDist(dm, dvId, norm = norm, removeOutliers = removeOutliers)
+			plt.legend(loc='best',frameon = False)
+			
+			plt.savefig("LP_dist_%s_%s_norm_%s_trim_%s.png" % (exp, dvId, norm, \
+				removeOutliers))
+			
+			# BINS:
+			fig = plt.figure()
+			plt.subplots_adjust(hspace = .3)
+			timecourse(dm, dvId, norm = norm, \
+				removeOutliers = removeOutliers)
+			plt.axhline(0, color = gray[5], linestyle = "--")
+			plt.ylim(-.2, .2)
+			plt.legend(loc='best', frameon =False)
+			plt.xlabel("Normalized saccade latency")
+			plt.ylabel("Normalized LP (pos. = handle, neg. = action-performing)")
+			plt.savefig("Bins_%s_%s_norm_%s_trim_%s.png" % (exp, dvId, norm, \
+				removeOutliers))
+
 	
-	fig = plt.figure()
-	nPlot = 0
-	for sacc in [1,2]:
-		print nPlot
-		nPlot +=1
-		plt.subplot(2,1,nPlot)
-		plt.title("sacc = %s" % sacc)
-		dv1 = "saccLat%s" % sacc
-		dv2 = "xNorm%s" % sacc
-		timecourse(dm, dv1, dv2)
-		plt.axhline(0, color = gray[5], linestyle = "--")
-		plt.ylim(-.2, .2)
-		#plt.show()
-	plt.savefig("Bins_%s_%s.png" % (exp, dvId))

@@ -68,6 +68,11 @@ class MyReader(EyelinkAscFolderReader):
 				"sTime", "size", "sx", "sy"]:
 				trialDict["sacc%s_%s" % (i, prop)] = -1000
 		
+		# In Exp 004A, those Booleans will be set to true in the unlikely 
+		# event of a failed fixation check on the fixation dot and/or object.
+		trialDict['checkFixDotFailed'] = False
+		trialDict['checkObjectFailed'] = False
+
 		
 	def parseLine(self, trialDict, l):
 		
@@ -109,8 +114,38 @@ class MyReader(EyelinkAscFolderReader):
 						# Save all available sacc info:
 						for i in sacc:
 							trialDict["sacc%s_%s" % (self.saccCount, i)] = sacc[i]
-						
 		
+		if self.exp == "004A":
+			# Fox Exp 004A:
+			# Determine the time stamp of the onset of the central fixation dot 
+			# (which was the start fot he first fixation check):
+			# MSG	31238826 display fixation
+			if 'display' in l and 'fixation' in l:
+				trialDict['timestampFixOnset'] = l[1]
+			
+			# Determine the success of the first fixation check (on the central 
+			# fix dot):
+			# MSG	2374487 fixation on fixdot check failed for 4000 samples in a row
+			if 'fixation' in l and 'fixdot' in l and 'samples' in l and 'failed' in l:
+				trialDict['checkFixDotFailed'] = True
+			
+			# Determine the success of the second fixation check (on the object):
+			# MSG	2383406 fixation on object check failed for 4000 samples in a row
+			if 'fixation' in l and 'object' in l and 'failed' in l:
+				trialDict['checkObjectFailed'] = True
+
+			# Determine the duration of the first fixation check (on the central fix
+			# dot):
+			# MSG	31239346 fixation on fixdot check successfull
+			if 'fixation' in l and 'fixdot' in l and 'successfull' in l:
+				trialDict['durCheck1'] = l[1] - trialDict['timestampFixOnset']
+
+			# Determine the success of the second fixation check (on the object):
+			# MSG	31239765 fixation on object check successfull
+			if 'fixation' in l and 'object' in l and 'successfull' in l:
+				self.timestampSuccess = l[1]
+				trialDict['durCheck2'] = l[1] - self.stimOnset
+
 		# Determine RT by taking stim onset 
 		# (rather than the absolute trial onset) into account:
 		# MSG	12966144 response given = 7

@@ -229,19 +229,21 @@ def plotFinal(trialDm, fig):
 	
 
 	# Absolute center:
+	# TODO: check!!!
 	if trialDm["flip"][0] == "left":
-		xStimFlipped = trialDm["xCogScaled"][0]
+		xCogNorm = -trialDm["xCogNorm"][0]
+		#xStimFlipped = trialDm["xCogScaled"][0]
 	elif trialDm["flip"][0] == "right":
-		xStimFlipped = -trialDm["xCogScaled"][0]
+		xCogNorm = trialDm["xCogNorm"][0]
 	else:
 		raise Exception("flip should have the value left or right")
 	
 	# Cog and absolute center:
 	if trialDm["expId"][0] != "004A":
 		cog = 0
-		absCenter = xStimFlipped/trialDm["wBoxScaled"][0]
+		absCenter = -xCogNorm
 	else:
-		cog = trialDm["xCogScaled"][0]/trialDm["wBoxScaled"][0]
+		cog = xCogNorm
 		absCenter = 0
 
 	plt.axvline(cog, linestyle = "--", color = "green", label = "cog")
@@ -251,9 +253,12 @@ def plotFinal(trialDm, fig):
 	plt.legend(frameon=False, loc = 'best')
 
 	# Bbox:
-	if trialDm["expId"][0] != "004A":
-		left = xStimFlipped/trialDm["wBoxScaled"]-.5
-	else:
+	if trialDm["expId"][0] != "004A":		
+		#left = xCogNorm/trialDm["wBoxScaled"]-.5
+		left = absCenter-.5
+		print 'absCenter = %s, left = %s' % (absCenter, left)
+		#raw_input()
+	elif trialDm["expId"][0] == "004A":
 		left = -.5
 	bbox = plt.Rectangle((left, -.5), 1, 1, color = "yellow")
 	fig.gca().add_artist(bbox)
@@ -321,22 +326,24 @@ if __name__ == "__main__":
 	
 	for exp in ["004A", "004B", "004C"]:
 		
-		if exp != "004B":
+		if exp != "004C":
 			continue
+		#if exp == "004B":
+			#continue
 
 		dm = getDm.getDm(exp, cacheId = "%s_final" % exp)
 		
 		for i in dm.range():
-			if dm["stim_name"][i] != "screwdriver":
+			if dm["stim_name"][i] != "hammer":
 				continue
-			if dm["stim_type"][i] != "object":
-				continue
-			if dm["mask_side"][i] != "control":
-				continue
+			#if dm["stim_type"][i] != "object":
+			#	continue
+			#if dm["mask_side"][i] != "control":
+			#	continue
 
 			# Save 1 in 40 trials:
 			#if i % 100 != 99:
-			#	continue
+				#continue
 			
 			trialDm = dm[i]
 			debugPlot(trialDm)

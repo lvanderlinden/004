@@ -16,9 +16,9 @@ srcStim = "/home/lotje/Documents/PhD Marseille/Studies/004/004C/opensesame scrip
 # The y position of the eyes should be at least 2 degrees (?) from the 
 # center of the display
 
-# TODO: Change for new ecc:
-minYDistFromFix = 2 * ratio
-#minYDistFromFix = 0
+# As in analyses for JoV V1:
+#minYDistFromFix = 2 * ratio
+minYDistFromFix = 170/2
 
 thLower = yCen - minYDistFromFix
 thUpper =  yCen + minYDistFromFix

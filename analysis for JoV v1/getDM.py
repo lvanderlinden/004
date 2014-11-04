@@ -203,7 +203,7 @@ def getDM(exp, noFiltering=False, driftCorr = True, excludeErrors = True, \
 		dm = dm.select('saccLat1 < %s'%saccTooSlow)
 
 	if rtTooFast != None:
-		dm = dm.select('%s > %s'%(rtVar,rtTooFast))
+		dm = dm.select('%s > %s'%(rtVar,rtTLooFast))
 	
 	if rtTooSlow != None:
 		dm = dm.select('%s < %s'%(rtVar,rtTooSlow))
