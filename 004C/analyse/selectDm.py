@@ -29,7 +29,6 @@ def selectDm(dm):
 	## As in analyses for previous JoV V1:
 	dm = dm.select("checkFixDotFailed == 'False'")
 	dm = dm.select("checkObjectFailed == 'False'")
-	
 
 	if exp == "004A":
 		dm = dm.select('durCheck1 < 1000')

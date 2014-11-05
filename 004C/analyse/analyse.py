@@ -237,7 +237,7 @@ if __name__ == "__main__":
 	
 	for exp in ["004A", "004C"]:
 		if exp == "004A":
-			continue
+		#	continue
 			lDv = ["xNorm", "xNormCorr"]
 		if exp == "004C":
 			lDv = ["xNorm"]
@@ -263,7 +263,7 @@ if __name__ == "__main__":
 			timecourse(dm, dvId, norm = norm, \
 				removeOutliers = removeOutliers)
 			plt.axhline(0, color = gray[5], linestyle = "--")
-			plt.ylim(-.2, .2)
+			plt.ylim(-.4, .1)
 			plt.legend(loc='best', frameon =False)
 			plt.xlabel("Normalized saccade latency")
 			plt.ylabel("Normalized LP (pos. = handle, neg. = action-performing)")
