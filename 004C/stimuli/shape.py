@@ -12,6 +12,7 @@ from matplotlib import pyplot as plt
 from scipy import ndimage, interpolate, misc
 from exparser import TraceKit as tk
 from skimage import draw
+import sys
 
 def fromRadialShape(a, r, shape):
 
@@ -108,6 +109,7 @@ def readBinIm(path):
 	im[i1] = 0
 	im[i2] = 1
 	im = ndimage.binary_fill_holes(im)
+	
 	return im
 
 def edgeDetect(im):
@@ -170,6 +172,9 @@ if __name__ == '__main__':
 		im = readBinIm('src/'+path)
 		a, r = toRadialShape(im)
 		im = fromRadialShape(a, r, im.shape)
+		plt.imshow(im)
+		plt.show()
+		sys.exit()
 		misc.imsave('mask/%s' % path, im)
 		#ns = addNoise(im)
 		#misc.imsave('mask-noise/%s' % path, ns)

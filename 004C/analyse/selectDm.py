@@ -36,6 +36,6 @@ def selectDm(dm):
 		dm = dm.select("accuracy == 1")
 	
 	if exp == "004C":
-		dm = dm.select("file != '004C3'")
-		dm = dm.select("correct == 1")
+		dm = dm.select("file != '004C3.asc'")
+		#dm = dm.select("correct == 1")
 	return dm

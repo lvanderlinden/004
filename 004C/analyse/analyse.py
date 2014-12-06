@@ -61,7 +61,7 @@ def plotDist(dm, dv, col=None, label=None, bins = 10):
 
 
 
-def gap(dm, norm=True, dv = "saccLat1", bins = 10):
+def gap(dm, dv = "saccLat1", nBins = 10, norm=True, removeOutliers = True):
 	
 	"""
 	Plots sacc lat distributions as a function of gap condition.
@@ -74,22 +74,28 @@ def gap(dm, norm=True, dv = "saccLat1", bins = 10):
 	"""
 
 	fig = plt.figure()
-	lCols = [blue[1], orange[1]]
+	nPlot = 0
 	
-	if not norm:
-		dv = dv
+	saccDm = getSaccDm(dm, dv = dv, nBins = nBins, norm = norm, \
+		removeOutliers = removeOutliers)
 	
-	elif norm:
-		dm = dm.addField("ws_%s" % dv)
-		dm = dm.withinize(dv, "ws_%s" % dv, "file")
+	if norm:
 		dv = "ws_%s" % dv
+
 	
-	for gap in dm.unique("gap"):
-		_dm = dm.select("gap == '%s'" % gap)
-		col = lCols.pop()
-		plotDist(_dm, dv, col=col, label = gap, bins = bins)
-	plt.legend(loc = 'best', frameon =False)
-	plt.savefig("gap.png")
+	for stimType in dm.unique("stim_type"):
+		stimDm = saccDm.select("stim_type == '%s'" % stimType)
+		nPlot +=1
+		plt.subplot(1,2,nPlot)
+		plt.title(stimType)
+		lCols = [blue[1], orange[1]]
+		for gap in dm.unique("gap"):
+			gapDm = stimDm.select("gap == '%s'" % gap)
+			col = lCols.pop()
+			plotDist(gapDm, dv, col=col, label = gap, bins = nBins)
+			plt.xlim(0,450)
+			plt.ylim(0,1.1)
+			plt.xlabel(dv)
 
 
 def lpDist(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 3, \
@@ -117,8 +123,8 @@ def lpDist(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 3, \
 		dv = "%s%s" % (dvId,sacc)
 		binVar = "saccLat%s" % sacc
 		
-		saccDm = getSaccDm(dm, dv, binVar, nBins = nBinsSaccLat, norm=norm, \
-			removeOutliers = removeOutliers)
+		saccDm = getSaccDm(dm, dv, nBins = nBinsSaccLat, binVar = binVar, \
+			norm=norm, removeOutliers = removeOutliers)
 		
 		if norm:
 			dv = "ws_%s" % dv
@@ -166,7 +172,7 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10):
 	
 		dv = "%s%s" % (dvId, sacc)
 		binVar = "saccLat%s" % sacc
-		saccDm = getSaccDm(dm, dv, binVar, nBins = nBins,\
+		saccDm = getSaccDm(dm, dv, nBins = nBins, binVar = binVar, \
 			norm=True, removeOutliers=True)
 		
 		if norm:
@@ -186,7 +192,7 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10):
 				markeredgewidth=1, label = stimType)
 		plt.axhline(0, color = gray[3], linestyle = "--")
 	
-def getSaccDm(dm, dv, binVar, nBins, norm=True, removeOutliers=True):
+def getSaccDm(dm, dv, nBins, binVar = None ,norm=True, removeOutliers=True):
 	
 	"""
 	Apply selection criteria to sacc dm.
@@ -210,8 +216,9 @@ def getSaccDm(dm, dv, binVar, nBins, norm=True, removeOutliers=True):
 		saccDm = saccDm.selectByStdDev(keys=["file"], dv = dv)
 		saccDm  = saccDm.removeField("__dummyCond__")
 		saccDm  = saccDm.removeField("__stdOutlier__")
-		# Latencies:
-		saccDm  = saccDm.selectByStdDev(keys=["file"], dv =binVar)
+		if binVar != None:
+			# Latencies:
+			saccDm  = saccDm.selectByStdDev(keys=["file"], dv =binVar)
 			
 	if norm:
 		# Normalize LPs:
@@ -219,14 +226,15 @@ def getSaccDm(dm, dv, binVar, nBins, norm=True, removeOutliers=True):
 		saccDm = saccDm.withinize(dv, "ws_%s" % dv, "file")
 		dv = "ws_%s" % dv
 
-	# Bin the bin var in the desired number of bins:
-	saccDm = saccDm.addField("bin_%s" % binVar)
-	
-	if norm:
-		saccDm = saccDm.calcPerc(binVar, "bin_%s" % binVar, keys=["file"], \
-			nBin=nBins)
-	else:
-		saccDm = saccDm.calcPerc(binVar, "bin_%s" % binVar, nBin=nBins)
+	if binVar != None:
+		# Bin the bin var in the desired number of bins:
+		saccDm = saccDm.addField("bin_%s" % binVar)
+		
+		if norm:
+			saccDm = saccDm.calcPerc(binVar, "bin_%s" % binVar, keys=["file"], \
+				nBin=nBins)
+		else:
+			saccDm = saccDm.calcPerc(binVar, "bin_%s" % binVar, nBin=nBins)
 
 	return saccDm
 
@@ -237,24 +245,26 @@ if __name__ == "__main__":
 	
 	for exp in ["004A", "004C"]:
 		if exp == "004A":
-		#	continue
+			continue
 			lDv = ["xNorm", "xNormCorr"]
 		if exp == "004C":
 			lDv = ["xNorm"]
 
 		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
+		dm = dm.select("subject_nr != 8")
+		dm = dm.select("subject_nr != 19")
 
 		for dvId in lDv:
 			
 			#if dvId == "xNormCorr":
 			#	continue
-			# DIST:
+			# DISTRIBUTIONS:
 			fig = plt.figure(figsize = (8,8))
 			plt.subplots_adjust(hspace = .3, wspace = .3)
 			lpDist(dm, dvId, norm = norm, removeOutliers = removeOutliers)
-			plt.legend(loc='best',frameon = False)
+			plt.legend(["early", "medium", "late"], loc='best',frameon = False)
 			
-			plt.savefig("LP_dist_%s_%s_norm_%s_trim_%s.png" % (exp, dvId, norm, \
+			plt.savefig("LP_dist_%s_%s_norm_%s_trim_%s.svg" % (exp, dvId, norm, \
 				removeOutliers))
 			
 			# BINS:
@@ -267,7 +277,7 @@ if __name__ == "__main__":
 			plt.legend(loc='best', frameon =False)
 			plt.xlabel("Normalized saccade latency")
 			plt.ylabel("Normalized LP (pos. = handle, neg. = action-performing)")
-			plt.savefig("Bins_%s_%s_norm_%s_trim_%s.png" % (exp, dvId, norm, \
+			plt.savefig("Bins_%s_%s_norm_%s_trim_%s.svg" % (exp, dvId, norm, \
 				removeOutliers))
 
 	
