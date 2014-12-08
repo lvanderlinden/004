@@ -6,12 +6,14 @@ Analyses for 004C
 import parse
 from exparser.Cache import cachedDataMatrix, cachedArray
 from exparser.PivotMatrix import PivotMatrix
+from exparser.RBridge import R
 from matplotlib import pyplot as plt
 from exparser.TangoPalette import *
 import numpy as np
 import sys
 import constants
 import getDm
+import getSaccDm
 
 def yNormDist(y):
 	
@@ -32,7 +34,7 @@ def yNormDist(y):
 	
 	return yNorm
 
-def plotDist(dm, dv, col=None, label=None, bins = 10):
+def oneDist(dm, dv, col=None, label=None, bins = 10):
 	
 	"""
 	Arguments:
@@ -76,7 +78,7 @@ def gap(dm, dv = "saccLat1", nBins = 10, norm=True, removeOutliers = True):
 	fig = plt.figure()
 	nPlot = 0
 	
-	saccDm = getSaccDm(dm, dv = dv, nBins = nBins, norm = norm, \
+	saccDm = getSaccDm.getSaccDm(dm, dv = dv, nBins = nBins, norm = norm, \
 		removeOutliers = removeOutliers)
 	
 	if norm:
@@ -92,13 +94,13 @@ def gap(dm, dv = "saccLat1", nBins = 10, norm=True, removeOutliers = True):
 		for gap in dm.unique("gap"):
 			gapDm = stimDm.select("gap == '%s'" % gap)
 			col = lCols.pop()
-			plotDist(gapDm, dv, col=col, label = gap, bins = nBins)
+			oneDist(gapDm, dv, col=col, label = gap, bins = nBins)
 			plt.xlim(0,450)
 			plt.ylim(0,1.1)
 			plt.xlabel(dv)
 
 
-def lpDist(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 3, \
+def lpDistribution(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 3, \
 	nBinsLps = 15):
 
 	"""
@@ -124,27 +126,30 @@ def lpDist(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 3, \
 		dv = "%s%s" % (dvId,sacc)
 		binVar = "saccLat%s" % sacc
 		
-		saccDm = getSaccDm(dm, dv, nBins = nBinsSaccLat, binVar = None, \
+		saccDm = getSaccDm.getSaccDm(dm, dv, nBins = nBinsSaccLat, binVar = None, \
 			norm=norm, removeOutliers = removeOutliers)
 		
 		if norm:
 			dv = "ws_%s" % dv
 
-		lCol = [blue[1], orange[1]]
 		for stimType in dm.unique("stim_type"):
 			stimDm = saccDm.select("stim_type == '%s'" % stimType)
-			col = lCol.pop()
-			plotDist(stimDm, dv, col=col, bins = nBinsLps, label = stimType)
+			
+			if stimType == "object":
+				col = blue[1]
+			elif stimType == "non-object":
+				col = orange[1]
+			oneDist(stimDm, dv, col=col, bins = nBinsLps, label = stimType)
 			plt.axvline(0, color = gray[3], linestyle = "--")
 			plt.xlim(-.7, .7)
 			plt.ylim(0,1.1)
 		plt.xlabel("Normalized LP")
 		plt.ylabel("Normalized frequency")
 		plt.legend(frameon = False)
-		plt.savefig("sacc_%s.svg" % (sacc))
-		plt.savefig("sacc_%s.png" % (sacc))
+		plt.savefig("./plots/%s_sacc_%s.svg" % (exp, sacc))
+		plt.savefig("./plots/%s_sacc_%s.png" % (exp, sacc))
 
-def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10):
+def lpTimecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10):
 	
 	"""
 	Arguments:
@@ -164,22 +169,27 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10):
 	
 	exp = dm["expId"][0]
 	
+	fig = plt.figure(figsize = (10,4))
+
 	for sacc in (1,2):
 	
 		dv = "%s%s" % (dvId, sacc)
 		binVar = "saccLat%s" % sacc
-		saccDm = getSaccDm(dm, dv, nBins = nBins, binVar = binVar, \
+		saccDm = getSaccDm.getSaccDm(dm, dv, nBins = nBins, binVar = binVar, \
 			norm=True, removeOutliers=True)
 		
 		if norm:
 			dv = "ws_%s" % dv
-
-		lCols = [blue[1], orange[1]]
-
-		for stimType in dm.unique("stim_type"):
-			col = lCols.pop()
-			stimDm = saccDm.select("stim_type == '%s'" % stimType)
 		
+		for stimType in dm.unique("stim_type"):
+			
+			if stimType == "object":
+				col = blue[1]
+			elif stimType == "non-object":
+				col = orange[1]
+			
+			stimDm = saccDm.select("stim_type == '%s'" % stimType)
+
 			cmX = stimDm.collapse(['bin_%s' % binVar], binVar)
 			cmY = stimDm.collapse(['bin_%s' % binVar], dv)
 			
@@ -188,75 +198,31 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10):
 				markeredgewidth=1, label = stimType)
 		plt.axhline(0, color = gray[3], linestyle = "--")
 	
-def getSaccDm(dm, dv, nBins, binVar = None ,norm=True, removeOutliers=True):
-	
-	"""
-	Apply selection criteria to sacc dm.
-	
-	NOTE: I made this a separate function just to be sure that the time course
-	and distribution plots come from exactly the same data set.
-	
-	Arguments:
-	dm
-	dv
-	binVar
-	nBins
-	"""
-
-	saccDm = dm.select("%s != ''" % dv)
-	saccDm = saccDm.select("%s != -1000" % dv)
-
-	if removeOutliers:
-		# Remove outliers:
-		# LPs:
-		saccDm = saccDm.selectByStdDev(keys=["file"], dv = dv)
-		saccDm  = saccDm.removeField("__dummyCond__")
-		saccDm  = saccDm.removeField("__stdOutlier__")
-		if binVar != None:
-			# Latencies:
-			saccDm  = saccDm.selectByStdDev(keys=["file"], dv =binVar)
-			
-	if norm:
-		# Normalize LPs:
-		saccDm = saccDm.addField("ws_%s" % dv)
-		saccDm = saccDm.withinize(dv, "ws_%s" % dv, "file")
-		dv = "ws_%s" % dv
-
-	if binVar != None:
-		# Bin the bin var in the desired number of bins:
-		saccDm = saccDm.addField("bin_%s" % binVar)
-		
-		if norm:
-			saccDm = saccDm.calcPerc(binVar, "bin_%s" % binVar, keys=["file"], \
-				nBin=nBins)
-		else:
-			saccDm = saccDm.calcPerc(binVar, "bin_%s" % binVar, nBin=nBins)
-
-	return saccDm
+	plt.axhline(0, color = gray[5], linestyle = "--")
+	plt.ylim(-.25, .05)
+	plt.legend(frameon =False)
+	plt.xlabel("Normalized saccade latency")
+	plt.ylabel("Normalized LP")
+	plt.savefig("./plots/%s_timecourse.svg" % exp)
+	plt.savefig("./plots/%s_timecourse.png" % exp)
 
 if __name__ == "__main__":
 	
 	norm = True
 	removeOutliers = True
 
-	exp = "004C"
-	dvId = "xNorm"
+	for exp in ["004A", "004C"]:
+		dvId = "xNorm"
 
-	dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
+		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
+		dm.save("DM_%s.csv" % exp)
+		
+		## DISTRIBUTIONS:
+		lpDistribution(dm, dvId, norm = norm, removeOutliers = removeOutliers)
+		
+		## BINS:
+		lpTimecourse(dm, dvId, norm = norm, \
+			removeOutliers = removeOutliers)
 
-	## DISTRIBUTIONS:
-	#lpDist(dm, dvId, norm = norm, removeOutliers = removeOutliers)
-	
-	# BINS:
-	fig = plt.figure(figsize = (10,4))
-	timecourse(dm, dvId, norm = norm, \
-		removeOutliers = removeOutliers)
-	plt.axhline(0, color = gray[5], linestyle = "--")
-	plt.ylim(-.25, .05)
-	plt.legend(frameon =False)
-	plt.xlabel("Normalized saccade latency")
-	plt.ylabel("Normalized LP")
-	plt.savefig("Timecourse.svg")
-	plt.savefig("Timecourse.png")
 
 	

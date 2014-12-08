@@ -10,6 +10,7 @@ import os
 import numpy as np
 from exparser.Cache import cachedDataMatrix, cachedArray
 from exparser.CsvReader import CsvReader
+from exparser.PivotMatrix import PivotMatrix
 import parse
 import addCoord
 import addLat
@@ -49,6 +50,3 @@ if __name__ == "__main__":
 			continue
 		
 		dm = getDm(exp = exp, cacheId = "%s_final" % exp)
-		
-
-

@@ -6,6 +6,6 @@ f = ".cache/004C_lat_driftcorr_False.npy"
 dm = DataMatrix(np.load(f))
 
 for pp in dm.unique("file"):
-	print pp
-	ppDm = dm.select("file == '%s'" % pp, verbose = False).select("xNorm1 != -1000")
-	
+	ppDm = dm.select("file == '%s'" % pp, verbose = False)
+	_ppDm = ppDm.select("xNorm1 == -1000", verbose = False)
+	print pp, float(len(_ppDm))/float(len(ppDm))
