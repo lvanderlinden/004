@@ -117,6 +117,17 @@ def addCommonFactors(dm):
 		
 		# Set mask side to control:
 		dm = dm.addField("mask_side", dtype = str, default = 'control')
+		
+	# Indicating whether or not the angle deviates from the vertical meridian.
+	if dm["expId"][0] == "004C":
+	
+		dm = dm.addField("devAngle", dtype = str, default = "yes")
+		dm["devAngle"][dm.where("realAngle == 0")] = "no"
+		dm["devAngle"][dm.where("realAngle == 180")] = "no"
+
+	
+	else:
+		dm = dm.addField("devAngle", dtype = str, default = "no")
 	
 	return dm
 	

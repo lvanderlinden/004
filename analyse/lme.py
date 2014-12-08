@@ -42,15 +42,8 @@ def lme(dm, dvId, removeOutliers = True, fullModel = False):
 		if saccDm.count('stim_type') == 1:
 			
 			if fullModel:
-				
-				# TODO: to addVars module
-				saccDm = saccDm.addField("devAngle", dtype = str, default = "yes")
-				saccDm["devAngle"][saccDm.where("realAngle == 0")] = "no"
-				saccDm["devAngle"][saccDm.where("realAngle == 180")] = "no"
-
 				f = "xNorm%s ~ saccLat%s*response_hand*y_stim + (1+saccLat%s|file) + (1+saccLat%s|stim_name)" % \
 					(sacc, sacc, sacc, sacc)
-				
 			else:
 				f = "xNorm%s ~ saccLat%s + (1+saccLat%s|file) + (1+saccLat%s|stim_name)" % \
 					(sacc, sacc, sacc, sacc)
@@ -58,8 +51,7 @@ def lme(dm, dvId, removeOutliers = True, fullModel = False):
 		else:
 			
 			if fullModel:
-				f = "xNorm%s ~ saccLat%s*stim_type+correct_response+ecc+visual_field+devAngle + (1+saccLat%s+stim_type|stim_name)" % \
-					(sacc, sacc, sacc)
+				f = "xNorm%s ~ saccLat%s*stim_type+correct_response+ecc+visual_field+devAngle + (1+saccLat%s+stim_type|stim_name)" % (sacc, sacc, sacc)
 			else:
 				f = "xNorm%s ~ saccLat%s*stim_type + (1+saccLat%s+stim_type|stim_name)" % \
 					(sacc, sacc, sacc)

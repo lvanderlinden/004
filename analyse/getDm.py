@@ -45,8 +45,4 @@ def getDm(exp):
 if __name__ == "__main__":
 
 	for exp in ["004A", "004B", "004C"]:
-		
-		if exp != "004C":
-			continue
-		
 		dm = getDm(exp = exp, cacheId = "%s_final" % exp)
