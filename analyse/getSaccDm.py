@@ -35,13 +35,15 @@ def getSaccDm(dm, dv, nBins = 10, binVar = None ,norm=True, removeOutliers=True)
 	if removeOutliers:
 		# Remove outliers:
 		# LPs:
-		saccDm = saccDm.selectByStdDev(keys=["file"], dv = dv)
+		saccDm = saccDm.selectByStdDev(keys=["file"], dv = dv, verbose = True)
 		saccDm  = saccDm.removeField("__dummyCond__")
 		saccDm  = saccDm.removeField("__stdOutlier__")
 		if binVar != None:
 			# Latencies:
 			saccDm  = saccDm.selectByStdDev(keys=["file"], dv =binVar)
-			
+		#print
+		#print "....."
+		#raw_input()	
 	if norm:
 		# Normalize LPs:
 		saccDm = saccDm.addField("ws_%s" % dv)

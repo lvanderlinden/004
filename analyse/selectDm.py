@@ -31,11 +31,11 @@ def selectDm(dm):
 	dm = dm.select("checkObjectFailed == 'False'")
 
 	if exp == "004A":
-		dm = dm.select('durCheck1 < 1000')
-		dm = dm.select('durCheck2 < 1000')
+	#	dm = dm.select('durCheck1 < 1000')
+	#	dm = dm.select('durCheck2 < 1000')
 		dm = dm.select("accuracy == 1")
 	
 	if exp == "004C":
 		dm = dm.select("file != '004C3.asc'")
-		#dm = dm.select("correct == 1")
+		dm = dm.select("correct == 1")
 	return dm

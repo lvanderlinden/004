@@ -4,6 +4,7 @@ Flip landing positions as if handle was always oriented to the right
 """
 
 from matplotlib import pyplot as plt
+import constants
 
 def flip(x,y, flipCond, vf, plot = True):
 	

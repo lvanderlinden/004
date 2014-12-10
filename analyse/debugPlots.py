@@ -7,6 +7,7 @@ dv.
 import getDm
 import parse
 from exparser.Cache import cachedDataMatrix, cachedArray
+from exparser.DataMatrix import DataMatrix
 from exparser.PivotMatrix import PivotMatrix
 from matplotlib import pyplot as plt
 from exparser.TangoPalette import *
@@ -49,6 +50,13 @@ def plotSaccades(trialDm, fig, xSaccId, ySaccId):
 	saccCount = int(trialDm["saccCount"][0])
 	for sacc in range(1, saccCount +1):
 		
+		if sacc == 1:
+			color = blue[0]
+		if sacc == 2:
+			color = blue[1]
+		if sacc >2:
+			color = blue[2]
+		
 		# HACK:
 		if sacc > 5:
 			continue
@@ -56,7 +64,7 @@ def plotSaccades(trialDm, fig, xSaccId, ySaccId):
 		x = trialDm[xSaccId % sacc][0]
 		y = trialDm[ySaccId % sacc][0]
 		
-		lp = plt.Circle((x,y), r, color = "blue")
+		lp = plt.Circle((x,y), r, color = color, label = sacc)
 		fig.gca().add_artist(lp)
 
 
@@ -287,6 +295,7 @@ def debugPlot(trialDm):
 	angle = trialDm["realAngle"][0]
 	plt.title("%s\nreal a = %s" % (vf, angle))
 	plotRaw(trialDm, fig)
+	plt.legend(loc = 'best')
 
 	# Plot 2: Normalized on center of the screen:
 	plt.subplot(5,1,2)
@@ -316,6 +325,7 @@ def debugPlot(trialDm):
 		
 	figPath = os.path.join(expPath, "%s_%s.png" % (trialDm["file"][0], \
 		str(trialDm["trialId"][0])))
+	
 	plt.savefig(figPath)
 	#plt.show()
 	
@@ -324,26 +334,21 @@ def debugPlot(trialDm):
 	#raw_input()
 if __name__ == "__main__":
 	
-	for exp in ["004A", "004B", "004C"]:
-		
-		if exp != "004C":
-			continue
-		#if exp == "004B":
-			#continue
+	f = ".cache/dm_sim_select_driftcorr.npy"
+	dm = DataMatrix(np.load(f))
+	dm = dm.select("gap == 'zero'")
+	
+	for i in dm.range():
+		#if dm["stim_name"][i] != "hammer":
+		#	continue
+		#if dm["stim_type"][i] != "object":
+		#	continue
+		#if dm["mask_side"][i] != "control":
+		#	continue
 
-		dm = getDm.getDm(exp, cacheId = "%s_final" % exp)
+		# Save 1 in 40 trials:
+		#if i % 100 != 99:
+		#	continue
 		
-		for i in dm.range():
-			if dm["stim_name"][i] != "hammer":
-				continue
-			#if dm["stim_type"][i] != "object":
-			#	continue
-			#if dm["mask_side"][i] != "control":
-			#	continue
-
-			# Save 1 in 40 trials:
-			#if i % 100 != 99:
-				#continue
-			
-			trialDm = dm[i]
-			debugPlot(trialDm)
+		trialDm = dm[i]
+		debugPlot(trialDm)

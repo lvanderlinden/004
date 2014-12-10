@@ -91,7 +91,7 @@ def addCommonFactors(dm):
 	dm		--- A datamatrix instance.
 	"""
 	
-	if dm["expId"][0] != "004C":
+	if dm["expId"][0] != "004C" and dm["expId"][0] != "sim":
 		dm = addAngle(dm)
 		
 		# Rename some variables that had different names in 004A/004B vs 004C:

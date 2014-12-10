@@ -15,52 +15,44 @@ import constants
 import getDm
 import getSaccDm
 
-def lme(dm, dvId, removeOutliers = True, fullModel = False):
+def lmePerSacc(dm, sacc, fullModel = False):
 	
 	"""
-	Arguments:
-	TODO
 	"""
+	
+	R().load(dm)
 	
 	exp = dm["expId"][0]
 	
+	# See Barr 2012
+	# Note: if I use (1+saccLat%s+stim_type|stim_name) as random effect, nothing
+	# is significant
 	
-	
-	fig = plt.figure(figsize = (10,4))
-
-	for sacc in (1,2):
-		dv = "%s%s" % (dvId, sacc)
-		saccDm = getSaccDm.getSaccDm(dm, dv, binVar = None, \
-			norm=False, removeOutliers=True)
-	
-		R().load(saccDm)
+	if dm.count('stim_type') == 1:
 		
-		# See Barr 2012
-		# Note: if I use (1+saccLat%s+stim_type|stim_name) as random effect, nothing
-		# is significant
-		
-		if saccDm.count('stim_type') == 1:
-			
-			if fullModel:
-				f = "xNorm%s ~ saccLat%s*response_hand*y_stim + (1+saccLat%s|file) + (1+saccLat%s|stim_name)" % \
-					(sacc, sacc, sacc, sacc)
-			else:
-				f = "xNorm%s ~ saccLat%s + (1+saccLat%s|file) + (1+saccLat%s|stim_name)" % \
-					(sacc, sacc, sacc, sacc)
-				
-		else:
-			
-			if fullModel:
-				f = "xNorm%s ~ saccLat%s*stim_type+correct_response+ecc+visual_field+devAngle + (1+saccLat%s+stim_type|stim_name)" % (sacc, sacc, sacc)
-			else:
-				f = "xNorm%s ~ saccLat%s*stim_type + (1+saccLat%s+stim_type|stim_name)" % \
-					(sacc, sacc, sacc)
-				
-		lm = R().lmer(f)
 		if fullModel:
-			lm.save("Stats_full_model_exp%s_sacc%s.csv" % (exp, sacc))
+			f = "xNorm%s ~ saccLat%s*response_hand*y_stim + (1+saccLat%s|file) + (1+saccLat%s|stim_name)" % \
+				(sacc, sacc, sacc, sacc)
 		else:
-			lm.save("Stats_simple_model_exp%s_sacc%s.csv" % (exp, sacc))
+			f = "xNorm%s ~ saccLat%s + (1+saccLat%s|file) + (1+saccLat%s|stim_name)" % \
+				(sacc, sacc, sacc, sacc)
+			
+	else:
+		
+		if fullModel:
+			f = "xNorm%s ~ saccLat%s*stim_type+correct_response+ecc+visual_field+devAngle + (1+saccLat%s+stim_type|stim_name)" % (sacc, sacc, sacc)
+		else:
+			f = "xNorm%s ~ saccLat%s*stim_type + (1+saccLat%s+stim_type|stim_name)" % \
+				(sacc, sacc, sacc)
+			
+	lm = R().lmer(f)
+	if fullModel:
+		lm.save("Stats_full_model_exp%s_sacc%s.csv" % (exp, sacc))
+	else:
+		lm.save("Stats_simple_model_exp%s_sacc%s.csv" % (exp, sacc))
+		
+	return lm
+
 
 if __name__ == "__main__":
 	
@@ -69,8 +61,11 @@ if __name__ == "__main__":
 
 	for exp in ["004A", "004C"]:
 		
+		if exp == "004A":
+			continue
+		
 		dvId = "xNorm"
 		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
-		lme(dm, dvId)
+		lme(dm, dvId, fullModel = False)
 
 	

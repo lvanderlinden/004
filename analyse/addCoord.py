@@ -22,6 +22,7 @@ from exparser.PivotMatrix import PivotMatrix
 from exparser.EyelinkAscFolderReader import EyelinkAscFolderReader
 from exparser.CsvReader import CsvReader
 from exparser.Cache import cachedDataMatrix, cachedArray
+import constants
 
 @cachedDataMatrix
 def addCoord(dm, plot = False):

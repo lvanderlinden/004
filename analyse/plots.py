@@ -6,6 +6,7 @@ Analyses for 004C
 import parse
 from exparser.Cache import cachedDataMatrix, cachedArray
 from exparser.PivotMatrix import PivotMatrix
+from exparser.DataMatrix import DataMatrix
 from exparser.RBridge import R
 from matplotlib import pyplot as plt
 from exparser.TangoPalette import *
@@ -14,6 +15,12 @@ import sys
 import constants
 import getDm
 import getSaccDm
+import lme
+
+# Set font:
+plt.rc("font", family="arial")
+plt.rc("font", size=8)
+
 
 def yNormDist(y):
 	
@@ -99,8 +106,7 @@ def gap(dm, dv = "saccLat1", nBins = 10, norm=True, removeOutliers = True):
 			plt.ylim(0,1.1)
 			plt.xlabel(dv)
 
-
-def lpDistribution(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 3, \
+def distributions004C(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 3, \
 	nBinsLps = 15):
 
 	"""
@@ -120,8 +126,78 @@ def lpDistribution(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 
 	
 	plotCount = 0
 	
+	fig = plt.figure(figsize = (8,4))
+	
+	for stimType in dm.unique("stim_type"):
+		stimDm = dm.select("stim_type == '%s'" % stimType)
+		
+		plotCount +=1
+		
+		plt.subplot(1,2,plotCount)
+		plt.title(stimType)
+
+		for sacc in [1, 2]:
+			dv = "%s%s" % (dvId,sacc)
+			binVar = "saccLat%s" % sacc
+			
+			saccDm = getSaccDm.getSaccDm(stimDm, dv, nBins = nBinsSaccLat, binVar = None, \
+				norm=norm, removeOutliers = removeOutliers)
+			
+			if norm:
+				dv = "ws_%s" % dv
+
+			if sacc == 1:
+				label = "initial saccade"
+				if stimType == "object":
+					col = blue[0]
+				elif stimType == "non-object":
+					col = orange[0]
+
+			elif sacc == 2:
+				label = "refixation"
+				if stimType == "object":
+					col = blue[2]
+				elif stimType == "non-object":
+					col = orange[2]
+			
+			oneDist(saccDm, dv, col=col, bins = nBinsLps, label = label)
+			plt.axvline(0, color = gray[3], linestyle = "--")
+			plt.xlim(-.7, .7)
+			plt.ylim(0,1.1)
+		
+		if stimType == "object":
+			plt.ylabel("Normalized frequency")
+		
+		plt.xlabel("Normalized LP")
+		plt.ylabel("Normalized frequency")
+		
+		plt.legend(frameon = False)
+	plt.savefig("./plots/Distribution_004C.svg")
+	plt.savefig("./plots/Distribution_004C.png")
+
+def distributions004A(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 3, \
+	nBinsLps = 15):
+
+	"""
+	Plots landing positions of first and second fixation for exp 004A:
+	
+	Arguments:
+	dm
+	dvId		--- {xNorm, xNormAbsCenter}, of which the latter only holds for
+				exp 1.
+	"""
+	
+	exp = dm["expId"][0]
+
+	nCols = 2
+	nRows = 2
+	
+	plotCount = 0
+	
+
+	fig = plt.figure(figsize = (4,4))
+
 	for sacc in (1, 2):
-		fig = plt.figure(figsize = (5,5))
 		
 		dv = "%s%s" % (dvId,sacc)
 		binVar = "saccLat%s" % sacc
@@ -132,24 +208,65 @@ def lpDistribution(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 
 		if norm:
 			dv = "ws_%s" % dv
 
-		for stimType in dm.unique("stim_type"):
-			stimDm = saccDm.select("stim_type == '%s'" % stimType)
+		if sacc == 1:
+			col = blue[0]
+			label = "initial saccade"
+		elif sacc == 2:
+			col = blue[2]
+			label = "refixation"
 			
-			if stimType == "object":
-				col = blue[1]
-			elif stimType == "non-object":
-				col = orange[1]
-			oneDist(stimDm, dv, col=col, bins = nBinsLps, label = stimType)
-			plt.axvline(0, color = gray[3], linestyle = "--")
-			plt.xlim(-.7, .7)
-			plt.ylim(0,1.1)
-		plt.xlabel("Normalized LP")
-		plt.ylabel("Normalized frequency")
-		plt.legend(frameon = False)
-		plt.savefig("./plots/%s_sacc_%s.svg" % (exp, sacc))
-		plt.savefig("./plots/%s_sacc_%s.png" % (exp, sacc))
+		
+		oneDist(saccDm, dv, col=col, bins = nBinsLps, label = label)
+		plt.axvline(0, color = gray[3], linestyle = "--")
+		plt.xlim(-.7, .7)
+		plt.ylim(0,1.1)
+	plt.xlabel("Normalized LP")
+	plt.ylabel("Normalized frequency")
+	plt.legend(frameon = False, prop={'size':7})
+	plt.savefig("./plots/Distribution_004A.svg")
+	plt.savefig("./plots/Distribution_004A.png")
 
-def lpTimecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10):
+def plotRegression(lmerDm, sacc, col, stimType):
+	
+	"""
+	lmerDm	--- dm containing results lmer
+	"""
+	
+	if sacc == 1:
+		minLat = 120
+		maxLat = 280
+	if sacc == 2:
+		minLat = 250
+		maxLat = 650
+
+
+	# Plot regression:
+	if exp == "004A":
+		# Determine intercept and slope
+		intercept = lmerDm['est'][0]
+		slope = lmerDm['est'][1]
+		se = lmerDm['se'][0]
+		
+	if exp == "004C":
+		
+		# Non-object = reference
+		intercept = lmerDm['est'][0]
+		slope = lmerDm['est'][1]
+		se = lmerDm['se'][0]
+		
+		if stimType == "object":
+			intercept += lmerDm['est'][2] # Main effect stim_type
+			slope += lmerDm['est'][3] # interaction
+		
+	xData = np.array([minLat, maxLat])		
+	yData = intercept + slope * xData
+	yMax = intercept + 1.96*se + slope*xData
+	yMin = intercept - 1.96*se + slope*xData		
+	plt.fill_between(xData, yMin, yMax, alpha=.3, color=col)
+	#plt.plot(xData, yData, linestyle='--', color=col)
+	plt.plot(xData, yData, color=col)
+
+def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15):
 	
 	"""
 	Arguments:
@@ -169,7 +286,10 @@ def lpTimecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10):
 	
 	exp = dm["expId"][0]
 	
-	fig = plt.figure(figsize = (10,4))
+	fig = plt.figure(figsize = (6,2))
+	plt.subplots_adjust(bottom = .1)
+
+	plt.axhline(0, color = "black", linestyle = "--")
 
 	for sacc in (1,2):
 	
@@ -178,31 +298,39 @@ def lpTimecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10):
 		saccDm = getSaccDm.getSaccDm(dm, dv, nBins = nBins, binVar = binVar, \
 			norm=True, removeOutliers=True)
 		
+		lmerDm = lme.lmePerSacc(saccDm, sacc = sacc)
+		
 		if norm:
 			dv = "ws_%s" % dv
 		
 		for stimType in dm.unique("stim_type"):
-			
 			if stimType == "object":
-				col = blue[1]
+				if sacc == 1:
+					col = blue[0]
+				elif sacc == 2:
+					col = blue[2]
 			elif stimType == "non-object":
-				col = orange[1]
+				if sacc == 1:
+					col = orange[0]
+				elif sacc == 2:
+					col = orange[2]
 			
 			stimDm = saccDm.select("stim_type == '%s'" % stimType)
-
+			
+			plotRegression(lmerDm, sacc, col, stimType)
+			
+			# Plot bins:
 			cmX = stimDm.collapse(['bin_%s' % binVar], binVar)
 			cmY = stimDm.collapse(['bin_%s' % binVar], dv)
-			
-			plt.plot(cmX['mean'], cmY['mean'], marker = 'o', color=col, \
-				markerfacecolor='white', markeredgecolor=col, \
-				markeredgewidth=1, label = stimType)
-		plt.axhline(0, color = gray[3], linestyle = "--")
-	
-	plt.axhline(0, color = gray[5], linestyle = "--")
-	plt.ylim(-.25, .05)
-	plt.legend(frameon =False)
+			plt.scatter(cmX['mean'], cmY['mean'], marker = 'o', color=col,edgecolors="black")
+
+	if exp == "004C":
+		plt.ylim(-.2, .1)
+	else:
+		plt.ylim(-.4, .1)
 	plt.xlabel("Normalized saccade latency")
 	plt.ylabel("Normalized LP")
+	plt.xlim(100, 600)
 	plt.savefig("./plots/%s_timecourse.svg" % exp)
 	plt.savefig("./plots/%s_timecourse.png" % exp)
 
@@ -211,18 +339,36 @@ if __name__ == "__main__":
 	norm = True
 	removeOutliers = True
 
+
 	for exp in ["004A", "004C"]:
 		dvId = "xNorm"
 
+		if exp != "004A":
+			continue
+
 		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
-		dm.save("DM_%s.csv" % exp)
+
+		ecc = abs(dm["y_stim"])/constants.ratio
 		
-		## DISTRIBUTIONS:
-		lpDistribution(dm, dvId, norm = norm, removeOutliers = removeOutliers)
+		#print "min ecc = ", min(ecc)
+		#print "max ecc = ", max(ecc)
+		#print "mean = ", ecc.mean()
+		#print "SD = ", ecc.std()
 		
-		## BINS:
-		lpTimecourse(dm, dvId, norm = norm, \
-			removeOutliers = removeOutliers)
+		#plt.hist(dm["y_stim"])
+		#plt.show()
+		#sys.exit()
+		
+		
+		if exp == "004A":
+			distributions004A(dm, dvId, norm = norm, \
+				removeOutliers = removeOutliers)
+		elif exp == "004C":
+			distributions004C(dm, dvId, norm = norm, \
+				removeOutliers = removeOutliers)
+		# BINS:
+	#	timecourse(dm, dvId, norm = norm, \
+	#		removeOutliers = removeOutliers)
 
 
 	
