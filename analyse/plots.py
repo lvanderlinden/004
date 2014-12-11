@@ -237,7 +237,10 @@ def plotRegression(lmerDm, sacc, col, stimType):
 		maxLat = 280
 	if sacc == 2:
 		minLat = 250
-		maxLat = 650
+		if exp == "004C":
+			maxLat = 600
+		elif exp == "004A":
+			maxLat = 550
 
 
 	# Plot regression:
@@ -262,7 +265,7 @@ def plotRegression(lmerDm, sacc, col, stimType):
 	yData = intercept + slope * xData
 	yMax = intercept + 1.96*se + slope*xData
 	yMin = intercept - 1.96*se + slope*xData		
-	plt.fill_between(xData, yMin, yMax, alpha=.3, color=col)
+	plt.fill_between(xData, yMin, yMax, alpha=.15, color=col)
 	#plt.plot(xData, yData, linestyle='--', color=col)
 	plt.plot(xData, yData, color=col)
 
@@ -286,7 +289,7 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15):
 	
 	exp = dm["expId"][0]
 	
-	fig = plt.figure(figsize = (6,2))
+	fig = plt.figure(figsize = (8,4))
 	plt.subplots_adjust(bottom = .1)
 
 	plt.axhline(0, color = "black", linestyle = "--")
@@ -298,7 +301,7 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15):
 		saccDm = getSaccDm.getSaccDm(dm, dv, nBins = nBins, binVar = binVar, \
 			norm=True, removeOutliers=True)
 		
-		lmerDm = lme.lmePerSacc(saccDm, sacc = sacc)
+		lmerDm = lme.lmePerSacc(saccDm, sacc = sacc, fullModel = False)
 		
 		if norm:
 			dv = "ws_%s" % dv
@@ -306,14 +309,14 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15):
 		for stimType in dm.unique("stim_type"):
 			if stimType == "object":
 				if sacc == 1:
-					col = blue[0]
+					col = blue[1]
 				elif sacc == 2:
-					col = blue[2]
+					col = blue[1]
 			elif stimType == "non-object":
 				if sacc == 1:
-					col = orange[0]
+					col = orange[1]
 				elif sacc == 2:
-					col = orange[2]
+					col = orange[1]
 			
 			stimDm = saccDm.select("stim_type == '%s'" % stimType)
 			
@@ -322,19 +325,62 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15):
 			# Plot bins:
 			cmX = stimDm.collapse(['bin_%s' % binVar], binVar)
 			cmY = stimDm.collapse(['bin_%s' % binVar], dv)
-			plt.scatter(cmX['mean'], cmY['mean'], marker = 'o', color=col,edgecolors="black")
+			plt.scatter(cmX['mean'], cmY['mean'], marker = 'o', color="white",\
+				edgecolors=col)
 
 	if exp == "004C":
-		plt.ylim(-.2, .1)
+		plt.ylim(-.2, .07)
 	else:
 		plt.ylim(-.4, .1)
 	plt.xlabel("Normalized saccade latency")
 	plt.ylabel("Normalized LP")
-	plt.xlim(100, 600)
+	if exp == "004C":
+		plt.xlim(100, 600)
+	elif exp == "004A":
+		plt.xlim(100, 550)
 	plt.savefig("./plots/%s_timecourse.svg" % exp)
 	plt.savefig("./plots/%s_timecourse.png" % exp)
 
+def saliency():
+	
+	"""
+	Plots avg LPs simulation
+	"""
+	
+	fig = plt.figure(figsize = (1.5,4))
+	
+	dm = DataMatrix(np.load(".cache/dm_sim_select_driftcorr.npy"))
+
+	for stimType in dm.unique("stim_type"):
+		
+		if stimType == "object":
+			col = blue[1]
+		elif stimType == "non-object":
+			col = orange[1]
+		
+		lSacc = []
+		for sacc in [1,2]:
+			stimDm = dm.select("stim_type == '%s'" % stimType)
+		
+			m = stimDm["xNorm%s" % sacc].mean()
+			lSacc.append(m)
+			
+		plt.plot([1,2], lSacc, color = col, marker = 'o', markerfacecolor = 'white',
+			markeredgecolor = col, markeredgewidth = 1)
+	
+	plt.axhline(0, linestyle = "--", color = gray[3])
+	plt.ylim(-.2, .07)
+	plt.xlim(0.8, 2.2)
+	plt.savefig("./plots/simulation.png")
+	plt.savefig("./plots/simulation.svg")
+
+	#plt.show()
+	
+
 if __name__ == "__main__":
+	
+	#saliency()
+	#sys.exit()
 	
 	norm = True
 	removeOutliers = True
@@ -343,12 +389,32 @@ if __name__ == "__main__":
 	for exp in ["004A", "004C"]:
 		dvId = "xNorm"
 
-		if exp != "004A":
-			continue
+#		if exp != "004C":
+#			continue
 
 		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
+		
+#		print max(dm["count_trial_sequence"])
+#		sys.exit()
+#		
+		#ecc = dm["ecc"]/constants.ratio
+		
+		#print "m = ", ecc.mean()
+		#print "SD = ", ecc.std()
+		#sys.exit()
+		##plt.hist(dm["ecc"]/constants.ratio)
+		#plt.show()
+		
+		
+		#dm = dm.select("saccCount >= 2")
+		
 
-		ecc = abs(dm["y_stim"])/constants.ratio
+		#sys.exit()
+		#print dm["start_feedback_incorrect"]
+		#plt.hist(dm["start_feedback_incorrect"])
+		#plt.show()
+
+#		ecc = abs(dm["y_stim"])/constants.ratio
 		
 		#print "min ecc = ", min(ecc)
 		#print "max ecc = ", max(ecc)
@@ -367,8 +433,8 @@ if __name__ == "__main__":
 			distributions004C(dm, dvId, norm = norm, \
 				removeOutliers = removeOutliers)
 		# BINS:
-	#	timecourse(dm, dvId, norm = norm, \
-	#		removeOutliers = removeOutliers)
+		timecourse(dm, dvId, norm = norm, \
+			removeOutliers = removeOutliers)
 
 
 	

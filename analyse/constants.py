@@ -18,7 +18,7 @@ srcStim = "/home/lotje/Documents/PhD Marseille/Studies/004/004C/opensesame scrip
 
 # As in analyses for JoV V1:
 #minYDistFromFix = 2 * ratio
-minYDistFromFix = 170/2
+minYDistFromFix = 170/2 # 2.5 degr
 
 thLower = yCen - minYDistFromFix
 thUpper =  yCen + minYDistFromFix
