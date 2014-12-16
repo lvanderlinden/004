@@ -315,6 +315,7 @@ if __name__ == "__main__":
 		removeOutliers = removeOutliers)
 	timecourse(dm, dvId, norm = norm, \
 		removeOutliers = removeOutliers, center=center)
+	saliency()
 
 
 	

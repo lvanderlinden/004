@@ -11,9 +11,11 @@ import sys
 from exparser.CsvReader import CsvReader
 from matplotlib import pyplot as plt
 from exparser.Cache import cachedDataMatrix
+from exparser.DataMatrix import DataMatrix
 import addCoord
 import addLat
 import selectDm
+import numpy as np
 import addCommonFactors
 
 # Constants:
