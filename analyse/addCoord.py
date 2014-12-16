@@ -71,7 +71,6 @@ def addCoord(dm, plot = False):
 	dm = dm.addField("wBoxScaled")
 	dm = dm.addField("hBoxScaled")
 	
-	#if exp == "004C":
 	dm = dm.addField("xCogScaled")
 	dm = dm.addField("xCogScaledDegr")
 	dm = dm.addField("xCogNorm")
@@ -96,7 +95,6 @@ def addCoord(dm, plot = False):
 		dm["stimFile"][i] = stimFile
 		
 		# Scaled cog:
-		#if exp == "004C":
 		xCog = dm["xCog"][i]
 		xCogScaled = xCog/3
 		dm["xCogScaled"][i] = xCogScaled

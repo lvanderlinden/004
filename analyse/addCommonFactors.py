@@ -27,56 +27,40 @@ def addAngle(dm):
 
 	return dm
 
-def cogDict():
-	
-	"""
-	In 004B, I didn't log the cog nor the x coordinates of the stimulus.
-	Therefore, we need to read in this information from the csv file that
-	was also used when running the experiment in OpenSesame.
-	
-	We read this csv file in as a dictionary containing the following key-value
-	arrangement:
-	key = (object, mask, flip), tuple
-	value = xCog
-	"""
-
-	f = "cog_dict_004B.csv"
-	f = open(f, "r")
-	
-	d = {}
-	
-	for line in f:
-		for char in ['"', '(', ')', ' ', "'"]:
-			line =  line.replace(char,'')
-		
-		stimName, mask, flip, xCog, yCog, dirCog = line.split(",")
-		mask = mask.replace("mask_", '')
-		d[stimName, mask, flip] = xCog
-		
-	return d
-
-
 def addCog(dm):
 	
 	"""
-	In 004B, I didn't log the cog nor the x coordinates of the stimulus.
-	Therefore, we need to read in this information from the csv file that
-	was also used when running the experiment in OpenSesame.
+	Use NEW CoG calculation.
 	"""
 
 	# Get cog dictionary:
-	d = cogDict()
+	f = "compare cogs/cog_per_stim_004C.csv"
+	cogDm = CsvReader(f).dataMatrix()
 
-	dm = dm.addField("xCog")
-
+	dm = dm.addField("xCog", default = -1000)
+	
 	for i in dm.range():
 		
 		stimName = dm["object"][i]
-		mask = dm["mask_side"][i]
 		flip = dm["handle_side"][i]
+		symm = dm["symm"][i]
 		
-		xCog = d[stimName, mask, flip]
+		if symm == "symm":
+			continue
+		
+		xCogUnrot = cogDm.select("name == '%s'" % stimName, verbose = False)["xCog"][0]
+		
+		if flip == "left":
+			xCog = xCogUnrot * -1
+		elif flip == "right":
+			xCog = xCogUnrot
+		
 		dm["xCog"][i] = xCog
+		
+		#print "object = ", stimName
+		#print "symm = ", symm
+		#print "flip = ", flip
+		#print "cog = ", xCog
 		
 	return dm
 

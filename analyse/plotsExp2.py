@@ -69,43 +69,6 @@ def oneDist(dm, dv, col=None, label=None, bins = 10):
 		markerfacecolor = col, markeredgewidth = 1, label = label)
 
 
-
-def gap(dm, dv = "saccLat1", nBins = 10, norm=True, removeOutliers = True):
-	
-	"""
-	Plots sacc lat distributions as a function of gap condition.
-	
-	Arguments:
-	dm		--- DataMatrix instance
-	
-	Keyword arguments:
-	norm	--- Boolean indicating whether or not to remove BS variance.
-	"""
-
-	fig = plt.figure()
-	nPlot = 0
-	
-	saccDm = getSaccDm.getSaccDm(dm, dv = dv, nBins = nBins, norm = norm, \
-		removeOutliers = removeOutliers)
-	
-	if norm:
-		dv = "ws_%s" % dv
-
-	
-	for stimType in dm.unique("stim_type"):
-		stimDm = saccDm.select("stim_type == '%s'" % stimType)
-		nPlot +=1
-		plt.subplot(1,2,nPlot)
-		plt.title(stimType)
-		lCols = [blue[1], orange[1]]
-		for gap in dm.unique("gap"):
-			gapDm = stimDm.select("gap == '%s'" % gap)
-			col = lCols.pop()
-			oneDist(gapDm, dv, col=col, label = gap, bins = nBins)
-			plt.xlim(0,450)
-			plt.ylim(0,1.1)
-			plt.xlabel(dv)
-
 def distributions004C(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 3, \
 	nBinsLps = 15):
 
@@ -138,6 +101,8 @@ def distributions004C(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat
 
 		for sacc in [1, 2]:
 			dv = "%s%s" % (dvId,sacc)
+			
+			
 			binVar = "saccLat%s" % sacc
 			
 			saccDm = getSaccDm.getSaccDm(stimDm, dv, nBins = nBinsSaccLat, binVar = None, \
@@ -172,59 +137,9 @@ def distributions004C(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat
 		plt.ylabel("Normalized frequency")
 		
 		plt.legend(frameon = False)
+		
 	plt.savefig("./plots/Distribution_004C.svg")
 	plt.savefig("./plots/Distribution_004C.png")
-
-def distributions004A(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 3, \
-	nBinsLps = 15):
-
-	"""
-	Plots landing positions of first and second fixation for exp 004A:
-	
-	Arguments:
-	dm
-	dvId		--- {xNorm, xNormAbsCenter}, of which the latter only holds for
-				exp 1.
-	"""
-	
-	exp = dm["expId"][0]
-
-	nCols = 2
-	nRows = 2
-	
-	plotCount = 0
-	
-
-	fig = plt.figure(figsize = (4,4))
-
-	for sacc in (1, 2):
-		
-		dv = "%s%s" % (dvId,sacc)
-		binVar = "saccLat%s" % sacc
-		
-		saccDm = getSaccDm.getSaccDm(dm, dv, nBins = nBinsSaccLat, binVar = None, \
-			norm=norm, removeOutliers = removeOutliers)
-		
-		if norm:
-			dv = "ws_%s" % dv
-
-		if sacc == 1:
-			col = blue[0]
-			label = "initial saccade"
-		elif sacc == 2:
-			col = blue[2]
-			label = "refixation"
-			
-		
-		oneDist(saccDm, dv, col=col, bins = nBinsLps, label = label)
-		plt.axvline(0, color = gray[3], linestyle = "--")
-		plt.xlim(-.7, .7)
-		plt.ylim(0,1.1)
-	plt.xlabel("Normalized LP")
-	plt.ylabel("Normalized frequency")
-	plt.legend(frameon = False, prop={'size':7})
-	plt.savefig("./plots/Distribution_004A.svg")
-	plt.savefig("./plots/Distribution_004A.png")
 
 def plotRegression(lmerDm, sacc, col, stimType):
 	
@@ -269,7 +184,8 @@ def plotRegression(lmerDm, sacc, col, stimType):
 	#plt.plot(xData, yData, linestyle='--', color=col)
 	plt.plot(xData, yData, color=col)
 
-def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15):
+def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15, \
+	fullModel = False,center = False):
 	
 	"""
 	Arguments:
@@ -301,22 +217,20 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15):
 		saccDm = getSaccDm.getSaccDm(dm, dv, nBins = nBins, binVar = binVar, \
 			norm=True, removeOutliers=True)
 		
-		lmerDm = lme.lmePerSacc(saccDm, sacc = sacc, fullModel = False)
+		lmerDm = lme.lmePerSacc(saccDm, sacc = sacc, dvId = dvId, \
+			fullModel = fullModel, center = center)
 		
 		if norm:
 			dv = "ws_%s" % dv
 		
 		for stimType in dm.unique("stim_type"):
 			if stimType == "object":
-				if sacc == 1:
-					col = blue[1]
-				elif sacc == 2:
-					col = blue[1]
+				col = blue[1]
+				if exp == "004A" and not "Corr" in dv:
+					col = green[0]
+
 			elif stimType == "non-object":
-				if sacc == 1:
-					col = orange[1]
-				elif sacc == 2:
-					col = orange[1]
+				col = orange[1]
 			
 			stimDm = saccDm.select("stim_type == '%s'" % stimType)
 			
@@ -338,8 +252,14 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15):
 		plt.xlim(100, 600)
 	elif exp == "004A":
 		plt.xlim(100, 550)
-	plt.savefig("./plots/%s_timecourse.svg" % exp)
-	plt.savefig("./plots/%s_timecourse.png" % exp)
+	
+	if not fullModel and not center:
+		if "Corr" in dv:
+			plt.savefig("./plots/%s_timecourse_Corr.svg" % exp)
+			plt.savefig("./plots/%s_timecourse_Corr.png" % exp)
+		else:
+			plt.savefig("./plots/%s_timecourse.svg" % exp)
+			plt.savefig("./plots/%s_timecourse.png" % exp)
 
 def saliency():
 	
@@ -384,57 +304,17 @@ if __name__ == "__main__":
 	
 	norm = True
 	removeOutliers = True
+	center = False
+	
+	exp = "004C"
+	dvId = "xNorm"
 
+	dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
 
-	for exp in ["004A", "004C"]:
-		dvId = "xNorm"
-
-#		if exp != "004C":
-#			continue
-
-		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
-		
-#		print max(dm["count_trial_sequence"])
-#		sys.exit()
-#		
-		#ecc = dm["ecc"]/constants.ratio
-		
-		#print "m = ", ecc.mean()
-		#print "SD = ", ecc.std()
-		#sys.exit()
-		##plt.hist(dm["ecc"]/constants.ratio)
-		#plt.show()
-		
-		
-		#dm = dm.select("saccCount >= 2")
-		
-
-		#sys.exit()
-		#print dm["start_feedback_incorrect"]
-		#plt.hist(dm["start_feedback_incorrect"])
-		#plt.show()
-
-#		ecc = abs(dm["y_stim"])/constants.ratio
-		
-		#print "min ecc = ", min(ecc)
-		#print "max ecc = ", max(ecc)
-		#print "mean = ", ecc.mean()
-		#print "SD = ", ecc.std()
-		
-		#plt.hist(dm["y_stim"])
-		#plt.show()
-		#sys.exit()
-		
-		
-		if exp == "004A":
-			distributions004A(dm, dvId, norm = norm, \
-				removeOutliers = removeOutliers)
-		elif exp == "004C":
-			distributions004C(dm, dvId, norm = norm, \
-				removeOutliers = removeOutliers)
-		# BINS:
-		timecourse(dm, dvId, norm = norm, \
-			removeOutliers = removeOutliers)
+	distributions004C(dm, dvId, norm = norm, \
+		removeOutliers = removeOutliers)
+	timecourse(dm, dvId, norm = norm, \
+		removeOutliers = removeOutliers, center=center)
 
 
 	

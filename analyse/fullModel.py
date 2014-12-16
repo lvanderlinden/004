@@ -6,8 +6,7 @@ import numpy as np
 from exparser.PivotMatrix import PivotMatrix
 from exparser.CsvReader import CsvReader
 import scipy
-
-#dm = getDm.getDm("004C")
+import getDm
 
 def plotFullModel(dm, sacc):
 	
@@ -68,11 +67,11 @@ def plotFullModel(dm, sacc):
 	
 if __name__ == "__main__":
 	
-	dm = CsvReader("DM_004C.csv").dataMatrix()
-
+	#dm = CsvReader("DM_004C.csv").dataMatrix()
+	dm=getDm.getDm("004C", cacheId = "004C_final")
 	
 	for sacc in ["1", "2"]:
-		if sacc == "1":
-			continue
+		#if sacc == "1":
+		#	continue
 		
 		plotFullModel(dm, sacc)

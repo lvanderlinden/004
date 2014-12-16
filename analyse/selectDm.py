@@ -23,6 +23,7 @@ def selectDm(dm):
 		dm = dm.select("rep != 'practice'")
 	dm = dm.select("saccLat1 != ''")
 	dm = dm.select("saccLat1 > 0")
+	dm = dm.select("saccLat1 > 80")
 	dm = dm.select("xNorm1 != ''")
 	dm = dm.select("xNorm1 != -1000")
 	
@@ -31,8 +32,8 @@ def selectDm(dm):
 	dm = dm.select("checkObjectFailed == 'False'")
 
 	if exp == "004A":
-	#	dm = dm.select('durCheck1 < 1000')
-	#	dm = dm.select('durCheck2 < 1000')
+		#dm = dm.select('durCheck1 < 1000')
+		#dm = dm.select('durCheck2 < 1000')
 		dm = dm.select("accuracy == 1")
 	
 	if exp == "004C":

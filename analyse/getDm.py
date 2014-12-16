@@ -16,7 +16,7 @@ import addCoord
 import addLat
 import selectDm
 import addCommonFactors
-import analyse
+#import analyse
 from matplotlib import pyplot as plt
 from exparser.TangoPalette import *
 
@@ -39,10 +39,11 @@ def getDm(exp):
 	dm = addCoord.addCoord(dm, cacheId = "%s_coord_driftcorr_%s" % (exp, offlineDriftCorr))
 	dm = addLat.addLat(dm, cacheId = "%s_lat_driftcorr_%s" % (exp, offlineDriftCorr))
 	dm = selectDm.selectDm(dm, cacheId = "%s_select_driftcorr_%s" % (exp, offlineDriftCorr))
+	#raw_input()
 	
 	return dm
 
 if __name__ == "__main__":
 
-	for exp in ["004A", "004B", "004C"]:
+	for exp in ["004A", "004C"]:
 		dm = getDm(exp = exp, cacheId = "%s_final" % exp)
