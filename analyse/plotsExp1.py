@@ -1,6 +1,6 @@
 """
 DESCRIPTION:
-Analyses for 004C
+Analyses for 004A
 """
 
 import parse
@@ -134,29 +134,14 @@ def plotRegression(lmerDm, sacc, col, stimType):
 		maxLat = 280
 	if sacc == 2:
 		minLat = 250
-		if exp == "004C":
-			maxLat = 600
-		elif exp == "004A":
-			maxLat = 550
+		maxLat = 550
 
 
 	# Plot regression:
-	if exp == "004A":
-		# Determine intercept and slope
-		intercept = lmerDm['est'][0]
-		slope = lmerDm['est'][1]
-		se = lmerDm['se'][0]
-		
-	if exp == "004C":
-		
-		# Non-object = reference
-		intercept = lmerDm['est'][0]
-		slope = lmerDm['est'][1]
-		se = lmerDm['se'][0]
-		
-		if stimType == "object":
-			intercept += lmerDm['est'][2] # Main effect stim_type
-			slope += lmerDm['est'][3] # interaction
+	# Determine intercept and slope
+	intercept = lmerDm['est'][0]
+	slope = lmerDm['est'][1]
+	se = lmerDm['se'][0]
 		
 	xData = np.array([minLat, maxLat])		
 	yData = intercept + slope * xData
@@ -223,24 +208,18 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10, \
 			plt.scatter(cmX['mean'], cmY['mean'], marker = 'o', color="white",\
 				edgecolors=col)
 
-	if exp == "004C":
-		plt.ylim(-.2, .07)
-	else:
-		plt.ylim(-.32, .1)
+	plt.ylim(-.32, .1)
 	plt.xlabel("Normalized saccade latency")
 	plt.ylabel("Normalized LP")
-	if exp == "004C":
-		plt.xlim(100, 600)
-	elif exp == "004A":
-		plt.xlim(100, 550)
+	plt.xlim(100, 550)
 	
-	if not fullModel and not center:
+	if not fullModel:
 		if "Corr" in dv:
-			plt.savefig("./plots/%s_timecourse_Corr.svg" % exp)
-			plt.savefig("./plots/%s_timecourse_Corr.png" % exp)
+			plt.savefig("./plots/%s_timecourse_Corr_centered_%s.svg" % (exp, center))
+			plt.savefig("./plots/%s_timecourse_Corr_centered_%s.png" % (exp, center))
 		else:
-			plt.savefig("./plots/%s_timecourse.svg" % exp)
-			plt.savefig("./plots/%s_timecourse.png" % exp)
+			plt.savefig("./plots/%s_timecourse_centered_%s.svg" % (exp, center))
+			plt.savefig("./plots/%s_timecourse_centered_%s.png" % (exp, center))
 
 
 if __name__ == "__main__":

@@ -157,24 +157,18 @@ def plotRegression(lmerDm, sacc, col, stimType):
 		elif exp == "004A":
 			maxLat = 550
 
-
-	# Plot regression:
-	if exp == "004A":
-		# Determine intercept and slope
-		intercept = lmerDm['est'][0]
-		slope = lmerDm['est'][1]
-		se = lmerDm['se'][0]
-		
-	if exp == "004C":
-		
-		# Non-object = reference
-		intercept = lmerDm['est'][0]
-		slope = lmerDm['est'][1]
-		se = lmerDm['se'][0]
-		
-		if stimType == "object":
-			intercept += lmerDm['est'][2] # Main effect stim_type
-			slope += lmerDm['est'][3] # interaction
+	# Non-object = reference
+	intercept = lmerDm['est'][0]
+	slope = lmerDm['est'][1]
+	se = lmerDm['se'][0]
+	
+	
+	print "sacc = ", sacc
+	print "SE intercept = ", se
+	
+	if stimType == "object":
+		intercept += lmerDm['est'][2] # Main effect stim_type
+		slope += lmerDm['est'][3] # interaction
 		
 	xData = np.array([minLat, maxLat])		
 	yData = intercept + slope * xData
@@ -185,7 +179,7 @@ def plotRegression(lmerDm, sacc, col, stimType):
 	plt.plot(xData, yData, color=col)
 
 def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15, \
-	fullModel = False,center = False):
+	fullModel = False, center = False):
 	
 	"""
 	Arguments:
@@ -226,8 +220,6 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15, \
 		for stimType in dm.unique("stim_type"):
 			if stimType == "object":
 				col = blue[1]
-				if exp == "004A" and not "Corr" in dv:
-					col = green[0]
 
 			elif stimType == "non-object":
 				col = orange[1]
@@ -242,24 +234,13 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15, \
 			plt.scatter(cmX['mean'], cmY['mean'], marker = 'o', color="white",\
 				edgecolors=col)
 
-	if exp == "004C":
-		plt.ylim(-.2, .07)
-	else:
-		plt.ylim(-.4, .1)
+	plt.ylim(-.2, .07)
 	plt.xlabel("Normalized saccade latency")
 	plt.ylabel("Normalized LP")
-	if exp == "004C":
-		plt.xlim(100, 600)
-	elif exp == "004A":
-		plt.xlim(100, 550)
+	plt.xlim(100, 600)
 	
-	if not fullModel and not center:
-		if "Corr" in dv:
-			plt.savefig("./plots/%s_timecourse_Corr.svg" % exp)
-			plt.savefig("./plots/%s_timecourse_Corr.png" % exp)
-		else:
-			plt.savefig("./plots/%s_timecourse.svg" % exp)
-			plt.savefig("./plots/%s_timecourse.png" % exp)
+	if not fullModel:
+		plt.savefig("./plots/%s_timecourse_%s.png" % (exp, center))
 
 def saliency():
 	
@@ -304,18 +285,18 @@ if __name__ == "__main__":
 	
 	norm = True
 	removeOutliers = True
-	center = False
-	
-	exp = "004C"
-	dvId = "xNorm"
 
-	dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
+	for center in [True, False]:
+		exp = "004C"
+		dvId = "xNorm"
 
-	distributions004C(dm, dvId, norm = norm, \
-		removeOutliers = removeOutliers)
-	timecourse(dm, dvId, norm = norm, \
-		removeOutliers = removeOutliers, center=center)
-	saliency()
+		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
+
+		distributions004C(dm, dvId, norm = norm, \
+			removeOutliers = removeOutliers)
+		timecourse(dm, dvId, norm = norm, \
+			removeOutliers = removeOutliers, center=center)
+		saliency()
 
 
 	

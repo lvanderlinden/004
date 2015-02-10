@@ -27,8 +27,8 @@ def lmePerSacc(dm, sacc, dvId, fullModel = False, center = False):
 	# Note: if I use (1+saccLat%s+stim_type|stim_name) as random effect, nothing
 	# is significant
 	
-	dm = dm.addField("saccLatCen%s" % sacc)
-	dm["saccLatCen%s" % sacc] = dm["saccLat%s" % sacc] - dm["saccLat%s" % sacc].mean()
+	dm = dm.addField("saccLatCen")
+	dm["saccLatCen"] = dm["saccLat%s" % sacc] - dm["saccLat%s" % sacc].mean()
 	
 	if center:
 		print "Sacc = ", sacc
@@ -37,13 +37,10 @@ def lmePerSacc(dm, sacc, dvId, fullModel = False, center = False):
 	R().load(dm)
 	
 	dv = "%s%s" % (dvId, sacc)
+	saccVar = "saccLat%s" % sacc
+	if center:
+		saccVar = "saccLatCen"
 	
-	if not center:
-		saccVar = "saccLat%s" % sacc
-	elif center:
-		saccVar = "saccLatCen%s" % sacc
-	else:
-		raise Exception("Check Boolean center")
 	if dm.count('stim_type') == 1:
 		
 		if fullModel:
