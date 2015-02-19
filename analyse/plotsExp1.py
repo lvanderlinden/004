@@ -236,20 +236,33 @@ if __name__ == "__main__":
 		#if center == False:
 		#	continue
 
-		for dvId in ["xNorm", "xNormCorr"]:
-
-			fig = plt.figure(figsize = (10,4))
-			plt.subplots_adjust(wspace = .3, bottom = .3, left = .05, right = .95)
-			ax0 = plt.subplot2grid((1, 3), (0, 0))#, colspan=2)
-			plt.title("a) Distributions")
-			#plt.subplot(121)
-			distributions004A(dm, dvId, norm = norm, \
-				removeOutliers = removeOutliers)
+		nPlot = 0
+		fig = plt.figure(figsize = (15,4))
+		#for dvId in ["xNorm", "xNormCorr"]:
+			#nPlot +=1
 			
+		#plt.subplot(1,3,nPlot)
+		plt.subplots_adjust(wspace = .3, bottom = .3, left = .05, right = .95)
+		ax0 = plt.subplot2grid((1, 4), (0, 0))#, colspan=2)
+		plt.title("a) Distributions relative to OC")
+		#plt.subplot(121)
+		distributions004A(dm, "xNorm", norm = norm, \
+			removeOutliers = removeOutliers)
+			
+		#plt.subplot(1,3,nPlot)
+		ax1 = plt.subplot2grid((1, 4), (0, 1))#, colspan = 2)
 			#plt.subplot(122)
-			ax1 = plt.subplot2grid((1, 3), (0, 1), colspan = 2)
-			plt.title("b) Timecourse")
-			timecourse(dm, dvId, norm = norm, \
-				removeOutliers = removeOutliers, center=center)
-			if not center:
-				plt.savefig("%s_%s.png" % (exp, dvId))
+		#ax1 = plt.subplot2grid((1, 3), (0, 1), colspan = 2)
+		#plt.title("b) Timecourse")
+		plt.title("b) Distributions relative to CoG")
+		distributions004A(dm, "xNormCorr", norm = norm, \
+			removeOutliers = removeOutliers)
+
+		#plt.subplot(1,3,3)
+		ax2 = plt.subplot2grid((1, 4), (0, 2), colspan = 2)
+		plt.title("c) Time course")
+		timecourse(dm, "xNormCorr", norm = norm, \
+			removeOutliers = removeOutliers, center=center)
+		
+		if not center:
+			plt.savefig("Results_Exp1.png")
