@@ -15,11 +15,14 @@ import constants
 import getDm
 import getSaccDm
 
-def lmePerSacc(dm, sacc, dvId, fullModel = False, center = False):
+def lmePerSacc(dm, sacc, dvId, fullModel = False, center = False, changeRef = False):
 	
 	"""
 	"""
 	
+
+	changeRef = False
+
 	dm.save('test_dm.csv')
 	exp = dm["expId"][0]
 	
@@ -33,6 +36,25 @@ def lmePerSacc(dm, sacc, dvId, fullModel = False, center = False):
 	if center:
 		print "Sacc = ", sacc
 		print "ref = ", dm["saccLat%s" % sacc].mean()
+		#raw_input()
+	
+	dm = dm.addField("stim_type2", dtype =str)
+	dm["stim_type2"] = dm["stim_type"]
+	dm["stim_type2"][dm.where("stim_type == 'object'")] = "A_object"
+	
+	if changeRef == False:
+		iv = "stim_type"
+	else:
+		iv = "stim_type2"
+
+	
+	dm = dm.addField("visual_field2", dtype = str, default = "vf1")
+	dm["visual_field2"][dm.where("visual_field == 'lower'")] = "vf2"
+	
+	dm = dm.addField("response_hand", dtype = str, default = "right")
+	dm["response_hand"][dm.where("correct_response == 1")] = "left"
+	
+	dm.save("Voor_Bas_Sacc%s.csv" % sacc)
 	
 	R().load(dm)
 	
@@ -47,32 +69,67 @@ def lmePerSacc(dm, sacc, dvId, fullModel = False, center = False):
 	if dm.count('stim_type') == 1:
 		
 		if fullModel:
+			lm = f = None
 			f = "%s ~ %s*response_hand*y_stim + (1+%s|file) + (1+%s|stim_name)" % \
 				(dv, saccVar, saccVar,saccVar)
+			lm = R().lmer(f)
+			lm.save("%s.csv" % f)
+			lm.save("%s_fullModel_%s_center_%s_Sacc%s.csv" % (exp, fullModel, center, sacc))
 		else:
+			lm = f = None
 			f = "%s ~ %s + (1+%s|file) + (1+%s|stim_name)" % \
 				(dv, saccVar, saccVar, saccVar)
+			lm = R().lmer(f)
+			lm.save("%s_fullModel_%s_center_%s_Sacc%s.csv" % (exp, fullModel, center, sacc))
+			
 			
 	else:
 		
 		if fullModel:
-			f = "%s ~ %s*stim_type+correct_response+ecc+visual_field+devAngle + (1+%s+stim_type|stim_name)" % (dv, saccVar, saccVar)
+			if not changeRef:
+				lm = f = None
+				f = "%s ~ %s*stim_type+response_hand+ecc+visual_field2+devAngle + (1+%s+stim_type|file) + (1+%s+stim_type|stim_name)" % (dv, saccVar, saccVar, saccVar)
+				lm = R().lmer(f)
+				lm.save("%s_fullModel_%s_center_%s_Sacc%s.csv" % (exp, fullModel, center, sacc))
+			else:
+				#lm = f = None
+				#f = "%s ~ %s*stim_type2+response_hand+ecc+visual_field2+devAngle + (1+%s+stim_type2|file) + (1+%s+stim_type2|stim_name)" % (dv, saccVar, saccVar, saccVar)
+				#lm = R().lmer(f)
+				#lm.save("%s_fullModel_%s_center_%s_Sacc%s.csv" % (exp, fullModel, center, sacc))
+
+				lm = f = None
+				f = "%s ~ %s*stim_type2+visual_field2+devAngle + (1+%s+stim_type2|file) + (1+%s+stim_type2|stim_name)" % (dv, saccVar, saccVar, saccVar)
+				lm = R().lmer(f)
+				lm.save("%s_fullModel_%s_center_%s_Sacc%s.csv" % (exp, fullModel, center, sacc))
+
+
+
+
 		else:
-			f = "%s ~ %s*stim_type + (1+%s+stim_type|stim_name)" % \
-				(dv, saccVar, saccVar)
+			lm = f = None
+			f = "%s ~ %s*stim_type + (1+%s+stim_type|file) + (1+%s+stim_type|stim_name)" % \
+				(dv, saccVar, saccVar, saccVar)
+			lm = R().lmer(f)
+			lm.save("%s_fullModel_%s_center_%s_Sacc%s.csv" % (exp, fullModel, center, sacc))
 	
-			
-	lm = R().lmer(f)
-	if fullModel:
-		lm.save("Stats_full_model_exp%s_%s_centered_%s.csv" % (exp, dv, center))
-	else:
-		lm.save("Stats_simple_model_exp%s_%s_centered_%s.csv" % (exp, dv, center))
+	#if fullModel:
+
+		#lm.save("Stats_full_model_exp%s_%s_centered_%s.csv" % (exp, dv, center))
+	#else:
+
+		#print "centered = ", center
+		#print "DV = ", dv
+		#print "Sacc var = ", saccVar
+		#raw_input()
+
+		#lm.save("Stats_simple_model_exp%s_%s_centered_%s.csv" % (exp, dv, center))
 		
 	return lm
 
 
 
 if __name__ == "__main__":
+	
 	
 	norm = True
 	removeOutliers = True
@@ -84,6 +141,10 @@ if __name__ == "__main__":
 		
 		dvId = "xNorm"
 		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
+		
+		
+		#print dm.unique("devAngle")
+		#sys.exit()
 		lme(dm, dvId, fullModel = False)
 
 	

@@ -68,7 +68,7 @@ def oneDist(dm, dv, col=None, label=None, bins = 10):
 	plt.plot(x, yNorm, marker='.', color = col, markeredgecolor = col,\
 		markerfacecolor = col, markeredgewidth = 1, label = label)
 
-def distributions004A(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat = 3, \
+def distributions004A(dm, dvId, ax, norm = True, removeOutliers = True, nBinsSaccLat = 3, \
 	nBinsLps = 15):
 
 	"""
@@ -104,14 +104,14 @@ def distributions004A(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat
 			dv = "ws_%s" % dv
 
 		if sacc == 1:
-			col = green[0]
-			if "Corr" in dv:
-				col = blue[0]
+			col = blue[1]
+			#if "Corr" in dv:
+			#	col = blue[0]
 			label = "initial saccade"
 		elif sacc == 2:
-			col = green[2]
-			if "Corr" in dv:
-				col = blue[2]
+			col = orange[1]
+			#if "Corr" in dv:
+			#	col = blue[2]
 			label = "refixation"
 			
 		
@@ -120,8 +120,14 @@ def distributions004A(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat
 		plt.xlim(-.7, .7)
 		plt.ylim(0,1.1)
 	plt.xlabel("Normalized LP")
-	plt.ylabel("Normalized frequency")
-	plt.legend(frameon = False, prop={'size':7})
+	
+	if dvId == "xNorm":
+		plt.ylabel("Normalized frequency")
+		plt.legend(frameon = False, prop={'size':7})
+
+	if dvId == "xNormCorr":
+		ax.set_yticklabels([])
+		
 
 def plotRegression(lmerDm, sacc, col, stimType):
 	
@@ -151,7 +157,7 @@ def plotRegression(lmerDm, sacc, col, stimType):
 	#plt.plot(xData, yData, linestyle='--', color=col)
 	plt.plot(xData, yData, color=col)
 
-def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10, \
+def timecourse(dm, dvId, ax, norm = True,  removeOutliers = True, nBins = 10, \
 	fullModel = False,center = False):
 	
 	"""
@@ -174,7 +180,10 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10, \
 	
 	plt.subplots_adjust(bottom = .1)
 
-	plt.axhline(0, color = "black", linestyle = "--")
+	plt.axhline(0, color = "black", linestyle = "--", label = "OC")
+	
+	#avgCoG = dm.select("flip != 'left'")["xCogNorm"].mean()
+	#plt.axhline(avgCoG, color = "red", linestyle = "--", label = "CoG")
 
 	for sacc in (1,2):
 	
@@ -189,14 +198,18 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10, \
 		if norm:
 			dv = "ws_%s" % dv
 		
+		if sacc == 1:
+			col = blue[1]
+		elif sacc == 2:
+			col = orange[1]
 		for stimType in dm.unique("stim_type"):
-			if stimType == "object":
-				col = blue[1]
-				if exp == "004A" and not "Corr" in dv:
-					col = green[1]
+			#if stimType == "object":
+				#col = blue[1]
+				#if exp == "004A" and not "Corr" in dv:
+					#col = green[1]
 
-			elif stimType == "non-object":
-				col = orange[1]
+			#elif stimType == "non-object":
+				#col = orange[1]
 			
 			stimDm = saccDm.select("stim_type == '%s'" % stimType)
 			
@@ -213,6 +226,9 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 10, \
 	plt.ylabel("Normalized LP")
 	plt.xlim(100, 550)
 	
+	#plt.legend(frameon = False)
+	#ax.yaxis.tick_right()
+
 	if not fullModel:
 		if "Corr" in dv:
 			plt.savefig("./plots/%s_timecourse_Corr_centered_%s.svg" % (exp, center))
@@ -237,32 +253,32 @@ if __name__ == "__main__":
 		#	continue
 
 		nPlot = 0
-		fig = plt.figure(figsize = (15,4))
+		fig = plt.figure(figsize = (5,5))
+		
 		#for dvId in ["xNorm", "xNormCorr"]:
 			#nPlot +=1
 			
 		#plt.subplot(1,3,nPlot)
-		plt.subplots_adjust(wspace = .3, bottom = .3, left = .05, right = .95)
-		ax0 = plt.subplot2grid((1, 4), (0, 0))#, colspan=2)
+		plt.subplots_adjust(wspace = .1, hspace = .4, bottom = .3, left = .1, right = .9)
+		ax0 = plt.subplot2grid((2, 2), (0, 0))#, colspan=2)
 		plt.title("a) Distributions relative to OC")
 		#plt.subplot(121)
-		distributions004A(dm, "xNorm", norm = norm, \
+		distributions004A(dm, "xNorm", ax0, norm = norm, \
 			removeOutliers = removeOutliers)
 			
 		#plt.subplot(1,3,nPlot)
-		ax1 = plt.subplot2grid((1, 4), (0, 1))#, colspan = 2)
+		ax1 = plt.subplot2grid((2, 2), (0, 1))#, colspan = 2)
 			#plt.subplot(122)
 		#ax1 = plt.subplot2grid((1, 3), (0, 1), colspan = 2)
 		#plt.title("b) Timecourse")
 		plt.title("b) Distributions relative to CoG")
-		distributions004A(dm, "xNormCorr", norm = norm, \
+		distributions004A(dm, "xNormCorr", ax1, norm = norm, \
 			removeOutliers = removeOutliers)
 
 		#plt.subplot(1,3,3)
-		ax2 = plt.subplot2grid((1, 4), (0, 2), colspan = 2)
+		ax2 = plt.subplot2grid((2, 2), (1, 0), colspan = 2)
 		plt.title("c) Time course")
-		timecourse(dm, "xNormCorr", norm = norm, \
-			removeOutliers = removeOutliers, center=center)
+		timecourse(dm, "xNorm", ax2, norm = norm, \
+			removeOutliers = removeOutliers, center=center, fullModel = True)
 		
-		if not center:
-			plt.savefig("Results_Exp1.png")
+		plt.savefig("Results_Exp1_%s.png" % center)

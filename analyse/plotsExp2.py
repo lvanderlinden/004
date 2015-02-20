@@ -141,7 +141,7 @@ def distributions004C(dm, dvId, norm = True, removeOutliers = True, nBinsSaccLat
 	plt.savefig("./plots/Distribution_004C.svg")
 	plt.savefig("./plots/Distribution_004C.png")
 
-def plotRegression(lmerDm, sacc, col, stimType):
+def plotRegression(lmerDm, sacc, col, stimType, fullModel = False):
 	
 	"""
 	lmerDm	--- dm containing results lmer
@@ -161,14 +161,15 @@ def plotRegression(lmerDm, sacc, col, stimType):
 	intercept = lmerDm['est'][0]
 	slope = lmerDm['est'][1]
 	se = lmerDm['se'][0]
-	
-	
-	print "sacc = ", sacc
-	print "SE intercept = ", se
-	
+		
 	if stimType == "object":
 		intercept += lmerDm['est'][2] # Main effect stim_type
-		slope += lmerDm['est'][3] # interaction
+		if not fullModel:
+			slope += lmerDm['est'][3] # interaction
+		if fullModel:
+			slope += lmerDm['est'][7] # interaction
+			
+		
 		
 	xData = np.array([minLat, maxLat])		
 	yData = intercept + slope * xData
@@ -204,13 +205,15 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15, \
 
 	plt.axhline(0, color = "black", linestyle = "--")
 
+
 	for sacc in (1,2):
 	
 		dv = "%s%s" % (dvId, sacc)
 		binVar = "saccLat%s" % sacc
 		saccDm = getSaccDm.getSaccDm(dm, dv, nBins = nBins, binVar = binVar, \
 			norm=True, removeOutliers=True)
-		
+	
+		lmerDm = None
 		lmerDm = lme.lmePerSacc(saccDm, sacc = sacc, dvId = dvId, \
 			fullModel = fullModel, center = center)
 		
@@ -226,7 +229,7 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15, \
 			
 			stimDm = saccDm.select("stim_type == '%s'" % stimType)
 			
-			plotRegression(lmerDm, sacc, col, stimType)
+			plotRegression(lmerDm, sacc, col, stimType, fullModel = fullModel)
 			
 			# Plot bins:
 			cmX = stimDm.collapse(['bin_%s' % binVar], binVar)
@@ -239,8 +242,8 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15, \
 	plt.ylabel("Normalized LP")
 	plt.xlim(100, 600)
 	
-	if not fullModel:
-		plt.savefig("./plots/%s_timecourse_%s.png" % (exp, center))
+	#if not fullModel:
+	plt.savefig("./plots/%s_fullModel_%s_center_%s.png" % (exp, fullModel,center))
 
 def saliency():
 	
@@ -252,6 +255,25 @@ def saliency():
 	
 	dm = DataMatrix(np.load(".cache/dm_sim_select_driftcorr.npy"))
 
+	# PLOT SIMULATED SACCADES:
+	for stimType in dm.unique("stim_type"):
+		
+		if stimType == "object":
+			col = green[1]
+		elif stimType == "non-object":
+			col = red[1]
+		
+		lSacc = []
+		for sacc in [1,2]:
+			stimDm = dm.select("stim_type == '%s'" % stimType)
+		
+			m = stimDm["xNorm%s" % sacc].mean()
+			lSacc.append(m)
+			
+		plt.plot([1,2], lSacc, color = col, marker = 'o', markerfacecolor = 'white',
+			markeredgecolor = col, markeredgewidth = 1)
+	# HACK:
+	# PLOT REAL LPs:
 	for stimType in dm.unique("stim_type"):
 		
 		if stimType == "object":
@@ -289,14 +311,20 @@ if __name__ == "__main__":
 	for center in [True, False]:
 		exp = "004C"
 		dvId = "xNorm"
+		
+	#	if center == False:
+	#		continue
 
 		dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
-
-		distributions004C(dm, dvId, norm = norm, \
-			removeOutliers = removeOutliers)
+		
+		#print dm.unique("visual_field")
+		#sys.exit()
+		
+		#distributions004C(dm, dvId, norm = norm, \
+		#	removeOutliers = removeOutliers)
 		timecourse(dm, dvId, norm = norm, \
-			removeOutliers = removeOutliers, center=center)
-		saliency()
+			removeOutliers = removeOutliers, center=center, fullModel = True)
+		#saliency()
 
 
 	

@@ -49,7 +49,7 @@ def descrCog(dm):
 	"""
 	
 	dm = dm.select("flip != 'left'", verbose = False)
-	
+	#var = "xCogNorm"
 	var = "xCogScaledDegr"
 	print "Descriptives ", var
 	cm = dm.collapse(["stim_name", "stim_type"], var)
@@ -74,11 +74,15 @@ def descrDurFb(dm):
 	
 if __name__ == "__main__":
 	
-	dm = parse.parseAsc(cacheId = "parsed")
-	dm = getDm.addCoord(dm,cacheId = "with_coord")
-	dm = getDm.addLat(dm, cacheId = "with_lat")
-	dm = selectDm.select(dm, cacheId = "selection")
+	#dm = parse.parseAsc(exp = "004B", cacheId = "parsed")
+	#dm = getDm.addCoord(dm,cacheId = "with_coord")
+	#dm = getDm.addLat(dm, cacheId = "with_lat")
+	#dm = selectDm.select(dm, cacheId = "selection")
+	exp = "004C"
+	dm = getDm.getDm(exp = exp, cacheId = "%s_final" % exp)
+
 	descrCog(dm)
+	sys.exit()
 	descrStimSize(dm)
 	descrEcc(dm)
 	descrDurFb(dm)
