@@ -167,7 +167,7 @@ def plotRegression(lmerDm, sacc, col, stimType, fullModel = False):
 		if not fullModel:
 			slope += lmerDm['est'][3] # interaction
 		if fullModel:
-			slope += lmerDm['est'][7] # interaction
+			slope += lmerDm['est'][4] # interaction
 			
 		
 		
@@ -237,7 +237,7 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15, \
 			plt.scatter(cmX['mean'], cmY['mean'], marker = 'o', color="white",\
 				edgecolors=col)
 
-	plt.ylim(-.2, .07)
+	plt.ylim(-.3, .07)
 	plt.xlabel("Normalized saccade latency")
 	plt.ylabel("Normalized LP")
 	plt.xlim(100, 600)

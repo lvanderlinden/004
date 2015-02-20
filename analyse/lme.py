@@ -87,10 +87,25 @@ def lmePerSacc(dm, sacc, dvId, fullModel = False, center = False, changeRef = Fa
 		
 		if fullModel:
 			if not changeRef:
+				#lm = f = None
+				#f = "%s ~ %s*stim_type+response_hand+ecc+visual_field2+devAngle + (1+%s+stim_type|file) + (1+%s+stim_type|stim_name)" % (dv, saccVar, saccVar, saccVar)
+				#lm = R().lmer(f)
+				#lm.save("%s_fullModel_%s_center_%s_Sacc%s.csv" % (exp, fullModel, center, sacc))
+
+				##lm = f = None
+				##f = "%s ~ %s*stim_type+visual_field2+devAngle + (1+%s+stim_type|file) + (1+%s+stim_type|stim_name)" % (dv, saccVar, saccVar, saccVar)
+				##lm = R().lmer(f)
+				##lm.save("%s_fullModel_%s_center_%s_Sacc%s.csv" % (exp, fullModel, center, sacc))
+
+
 				lm = f = None
-				f = "%s ~ %s*stim_type+response_hand+ecc+visual_field2+devAngle + (1+%s+stim_type|file) + (1+%s+stim_type|stim_name)" % (dv, saccVar, saccVar, saccVar)
+				f = "%s ~ %s*stim_type+devAngle + (1+%s+stim_type|file) + (1+%s+stim_type|stim_name)" % (dv, saccVar, saccVar, saccVar)
 				lm = R().lmer(f)
 				lm.save("%s_fullModel_%s_center_%s_Sacc%s.csv" % (exp, fullModel, center, sacc))
+
+
+
+
 			else:
 				#lm = f = None
 				#f = "%s ~ %s*stim_type2+response_hand+ecc+visual_field2+devAngle + (1+%s+stim_type2|file) + (1+%s+stim_type2|stim_name)" % (dv, saccVar, saccVar, saccVar)
