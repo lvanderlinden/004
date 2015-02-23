@@ -244,6 +244,7 @@ def timecourse(dm, dvId, norm = True,  removeOutliers = True, nBins = 15, \
 	
 	#if not fullModel:
 	plt.savefig("./plots/%s_fullModel_%s_center_%s.png" % (exp, fullModel,center))
+	plt.savefig("./plots/%s_fullModel_%s_center_%s.svg" % (exp, fullModel,center))
 
 def saliency():
 	
@@ -289,11 +290,12 @@ def saliency():
 			lSacc.append(m)
 			
 		plt.plot([1,2], lSacc, color = col, marker = 'o', markerfacecolor = 'white',
-			markeredgecolor = col, markeredgewidth = 1)
+			markeredgecolor = col, markeredgewidth = 1, label = stimType)
 	
 	plt.axhline(0, linestyle = "--", color = gray[3])
-	plt.ylim(-.2, .07)
+	plt.ylim(-.3, .07)
 	plt.xlim(0.8, 2.2)
+	plt.legend(frameon = False)
 	plt.savefig("./plots/simulation.png")
 	plt.savefig("./plots/simulation.svg")
 
@@ -321,10 +323,10 @@ if __name__ == "__main__":
 		#sys.exit()
 		
 		#distributions004C(dm, dvId, norm = norm, \
-		#	removeOutliers = removeOutliers)
-		timecourse(dm, dvId, norm = norm, \
-			removeOutliers = removeOutliers, center=center, fullModel = True)
-		#saliency()
+			#removeOutliers = removeOutliers)
+		#timecourse(dm, dvId, norm = norm, \
+			#removeOutliers = removeOutliers, center=center, fullModel = True)
+		saliency()
 
 
 	

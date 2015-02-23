@@ -114,8 +114,16 @@ if __name__ == "__main__":
 	f = ".cache/dm_sim_select_driftcorr.npy"
 	dm = DataMatrix(np.load(f))
 	
+	fig = plt.figure()
 	nPlot = 0
-
-	plt.show()
-	sys.exit()
-	
+	for stimType in dm.unique("stim_type"):
+		stimDm = dm.select("stim_type == '%s'" % stimType)
+		
+		for sacc in (1,2):
+			nPlot +=1
+			plt.subplot(2,2,nPlot)
+			dv = "xNorm%s" % sacc
+			plt.title("%s sacc %s" % (stimType, sacc))
+			plt.hist(stimDm[dv], bins = 5)
+	plt.savefig("Distribution_simulated_saccades.png")
+			
